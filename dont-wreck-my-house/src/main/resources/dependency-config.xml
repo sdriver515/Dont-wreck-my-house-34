@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="forage_repository" class="learn.foraging.data.ForageFileRepository">
+        <constructor-arg value="./data/forage_data"/>
+    </bean>
+    <bean id="forager_repository" class="learn.foraging.data.ForagerFileRepository">
+        <constructor-arg value="./data/foragers.csv"/>
+    </bean>
+    <bean id="item_repository" class="learn.foraging.data.ItemFileRepository">
+        <constructor-arg value="./data/items.txt"/>
+    </bean>
+
+
+    <bean id="forager_service" class="learn.foraging.domain.ForagerService">
+        <constructor-arg ref="forager_repository"/>
+    </bean>
+    <bean id="forage_service" class="learn.foraging.domain.ForageService">
+        <constructor-arg ref="forage_repository"/>
+    </bean>
+    <bean id="item_service" class="learn.foraging.domain.ItemService">
+        <constructor-arg ref="item_repository"/>
+    </bean>
+
+
+    <bean id="view" class="learn.foraging.ui.View"/>
+    <bean id="io" class="learn.foraging.ui.ConsoleIO"/>
+    <bean id="generate_request" class="learn.foraging.ui.GenerateRequest"/>
+    <bean id="menu" class="learn.foraging.ui.MainMenuOption"/>
+
+
+    <bean class="learn.foraging.ui.Controller">
+        <constructor-arg ref="view"/>
+        <constructor-arg ref="io"/>
+        <constructor-arg ref="generate_request"/>
+        <constructor-arg ref="menu"/>
+        <constructor-arg ref="forager_service"/>
+        <constructor-arg ref="forage_service"/>
+        <constructor-arg ref="item_service"/>
+    </bean>
+
+</beans>
