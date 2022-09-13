@@ -42,6 +42,29 @@ public class ReservationFileRepository implements ReservationRepository{
         return result;
     }//findContentsOfReservationFilesByHostId
 
+    public Reservation findReservationByDatesAndHostId(String id, LocalDate startDate, LocalDate endDate, Guest guest){
+        List<Reservation> all = findContentsOfReservationFileByHostId(id);
+        for(Reservation reservation : all){
+            if(reservation.getStartDateOfStay().equals(startDate))
+                if(reservation.getEndDateOfStay() == endDate)
+                    if(reservation.getId() == guest.getId()){
+                        return reservation;
+                    }
+        }
+        return null;
+    }//findReservationByDatesAndHostId
+
+    @Override
+    public Reservation findById(int reservationId, String hostId) throws DataException {
+        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+        for(Reservation reservation : all){
+            if(reservation.getId() == reservationId){
+                return reservation;
+            }
+        }
+        return null;
+    }//findById
+
     @Override
     public List<Reservation> findContentsOfAllReservationFiles() {
         File[] filesList = returnDirectoryFilesList();
@@ -80,6 +103,15 @@ public class ReservationFileRepository implements ReservationRepository{
         }
         return false;
     }//update
+
+    @Override
+    public Reservation add(Reservation reservation) throws DataException {
+        List<Reservation> all = ;
+        forage.setId(java.util.UUID.randomUUID().toString());
+        all.add(forage);
+        writeAll(all, forage.getDate());
+        return forage;
+    }//add
 
     //DELETE
 
@@ -146,5 +178,14 @@ public class ReservationFileRepository implements ReservationRepository{
         }
     }//writeAll
 
+    private int getNextId(List<Reservation> reservations){
+        int maxId = 0;
+        for(Reservation reservation : reservations){
+            if(maxId < reservation.getId()){
+                maxId = reservation.getId();
+            }
+        }
+        return maxId+1;
+    }//getNextId
 
 }//end
