@@ -39,7 +39,7 @@ public class GuestFileRepository implements GuestRepository {
     //HELPER METHODS//
     private Guest deserialize(String[] fields) {
         Guest result = new Guest();
-        result.setIdOfGuest(Integer.parseInt(fields[0]));
+        result.setId(Integer.parseInt(fields[0]));
         result.setFirstNameOfGuest(fields[1]);
         result.setLastNameOfGuest(fields[2]);
         result.setEmailOfGuest(fields[3]);
@@ -50,7 +50,7 @@ public class GuestFileRepository implements GuestRepository {
 
     private String serialize(Guest guest) {
         return String.format("%s,%s,%s,%s,%s,%s",
-                guest.getIdOfGuest(),
+                guest.getId(),
                 guest.getFirstNameOfGuest(),
                 guest.getLastNameOfGuest(),
                 guest.getEmailOfGuest(),

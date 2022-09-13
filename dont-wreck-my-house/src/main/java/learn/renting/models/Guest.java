@@ -1,8 +1,10 @@
 package learn.renting.models;
 
+import java.util.Objects;
+
 public class Guest {
     //FIELDS
-    private int idOfGuest;
+    private int id;
     private String firstNameOfGuest;
     private String lastNameOfGuest;
     private String emailOfGuest;
@@ -10,11 +12,11 @@ public class Guest {
     private String stateOfGuest;
 
     //GETTERS AND SETTERS
-    public int getIdOfGuest() {
-        return idOfGuest;
+    public int getId() {
+        return id;
     }
-    public void setIdOfGuest(int idOfGuest) {
-        this.idOfGuest = idOfGuest;
+    public void setId(int idOfGuest) {
+        this.id = id;
     }
     public String getFirstNameOfGuest() {
         return firstNameOfGuest;
@@ -49,13 +51,31 @@ public class Guest {
 
     //CONSTRUCTORS
     public Guest(){}
-    public Guest(int idOfGuest, String firstNameOfGuest, String lastNameOfGuest, String emailOfGuest, String phoneOfGuest, String stateOfGuest) {
-        this.idOfGuest = idOfGuest;
+    public Guest(int id, String firstNameOfGuest, String lastNameOfGuest, String emailOfGuest, String phoneOfGuest, String stateOfGuest) {
+        this.id = id;
         this.firstNameOfGuest = firstNameOfGuest;
         this.lastNameOfGuest = lastNameOfGuest;
         this.emailOfGuest = emailOfGuest;
         this.phoneOfGuest = phoneOfGuest;
         this.stateOfGuest = stateOfGuest;
     }//Guest
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Guest guest = (Guest) o;
+        return id == guest.id &&
+                Objects.equals(firstNameOfGuest, guest.firstNameOfGuest) &&
+                lastNameOfGuest.equals(guest.lastNameOfGuest) &&
+                emailOfGuest.equals(guest.emailOfGuest) &&
+                phoneOfGuest.equals(guest.phoneOfGuest) &&
+                stateOfGuest.equals(guest.stateOfGuest);
+    }
+
+    @Override
+    public int hashCode() {//may end up deleting this
+        return Objects.hash(id, firstNameOfGuest, lastNameOfGuest, emailOfGuest, phoneOfGuest, stateOfGuest);
+    }
 
 }//end
