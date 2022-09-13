@@ -1,4 +1,4 @@
-package learn.renting;
+package learn.renting.data;
 
 import learn.renting.data.GuestFileRepository;
 import learn.renting.data.HostFileRepository;

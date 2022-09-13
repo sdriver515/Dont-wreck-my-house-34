@@ -1,4 +1,4 @@
-package learn.renting;
+package learn.renting.data;
 
 import learn.renting.data.HostFileRepository;
 import learn.renting.data.ReservationFileRepository;
@@ -25,5 +25,5 @@ public class ReservationFileRepositoryTest {
         Files.copy(seedPath, testPath, StandardCopyOption.REPLACE_EXISTING);
     }//setUp
 
-    
+
 }//end
