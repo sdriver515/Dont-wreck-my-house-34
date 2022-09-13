@@ -11,7 +11,7 @@
         <constructor-arg value="./dont-wreck-my-house-data/hosts.csv"/>
     </bean>
     <bean id="reservation_repository" class="learn.renting.data.ReservationFileRepository">
-        <constructor-arg value="./dont-wreck-my-house-data/"/>
+        <constructor-arg value="./dont-wreck-my-house-data/reservations"/>
     </bean>
 
 

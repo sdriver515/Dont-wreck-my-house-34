@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 public class ReservationFileRepository implements ReservationRepository{
     private final String directory;
     private static final String HEADER = "id,start_date,end_date,guest_id,total";
-    public ReservationFileRepository(@Value("${ReservationFilePath:./dont-wreck-my-house-data/}") String directory){
+    public ReservationFileRepository(@Value("${ReservationFilePath:./dont-wreck-my-house-data}") String directory){
         this.directory = directory;
     }//directoryFilepathForReservationFileRepository
 
