@@ -1,6 +1,5 @@
 package learn.renting.data;
 import learn.renting.models.Guest;
-import learn.renting.models.Host;
 import learn.renting.models.Reservation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -21,12 +20,21 @@ public class ReservationFileRepository implements ReservationRepository{
     }//directoryFilepathForReservationFileRepository
 
     //CREATE
+    @Override
+    public Reservation create(Reservation reservation, String hostId) throws DataException {
+        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+        int nextId = getNextId(all);
+        reservation.setId(nextId);
+        all.add(reservation);
+        writeAll(all, hostId);
+        return reservation;
+    }//create
 
     //READ
     @Override
-    public List<Reservation> findContentsOfReservationFileByHostId(String id) {
+    public List<Reservation> findContentsOfReservationFileByHostId(String hostId) {
         ArrayList<Reservation> result = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(id)))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(hostId)))) {
 
             reader.readLine();
 
@@ -34,7 +42,7 @@ public class ReservationFileRepository implements ReservationRepository{
 
                 String[] fields = line.split(",", -1);
                 if (fields.length == 5) {
-                    result.add(deserialize(fields, id));
+                    result.add(deserialize(fields, hostId));
                 }
             }
         } catch (IOException ex) {
@@ -42,28 +50,27 @@ public class ReservationFileRepository implements ReservationRepository{
         return result;
     }//findContentsOfReservationFilesByHostId
 
-    public Reservation findReservationByDatesAndHostId(String id, LocalDate startDate, LocalDate endDate, Guest guest){
-        List<Reservation> all = findContentsOfReservationFileByHostId(id);
+    public Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId){
+        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
         for(Reservation reservation : all){
             if(reservation.getStartDateOfStay().equals(startDate))
                 if(reservation.getEndDateOfStay() == endDate)
-                    if(reservation.getId() == guest.getId()){
+                    if(reservation.getGuest().getId() == guestId){
                         return reservation;
                     }
         }
         return null;
-    }//findReservationByDatesAndHostId
+    }//findReservationByHostIdAndDatesAndGuestId
 
-    @Override
-    public Reservation findById(int reservationId, String hostId) throws DataException {
+    public Reservation findFutureReservationByHostIdAndDate(String hostId, LocalDate startDate){
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        for(Reservation reservation : all){
-            if(reservation.getId() == reservationId){
+        for(Reservation reservation : all) {
+            if (reservation.getStartDateOfStay().equals(startDate)) {
                 return reservation;
             }
         }
         return null;
-    }//findById
+    }//findFutureReservationByHostIdAndDate
 
     @Override
     public List<Reservation> findContentsOfAllReservationFiles() {
@@ -90,9 +97,7 @@ public class ReservationFileRepository implements ReservationRepository{
 
     //UPDATE
     @Override
-    public boolean update(Reservation reservation, Host host, Guest guest) throws DataException {
-        String hostId = host.getId();
-        int guestId = guest.getId();
+    public boolean update(Reservation reservation, String hostId, int guestId) throws DataException {//problematic
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).getGuest().getId() == (guestId)) {
@@ -104,17 +109,21 @@ public class ReservationFileRepository implements ReservationRepository{
         return false;
     }//update
 
-    @Override
-    public Reservation add(Reservation reservation) throws DataException {
-        List<Reservation> all = ;
-        forage.setId(java.util.UUID.randomUUID().toString());
-        all.add(forage);
-        writeAll(all, forage.getDate());
-        return forage;
-    }//add
-
     //DELETE
-
+    @Override
+    public boolean deleteByParameters(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
+        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+        for(int i = 0; i < all.size(); i++){
+            if(all.get(i).getStartDateOfStay().equals(startDate))
+                if(all.get(i).getEndDateOfStay().equals(endDate))
+                    if(all.get(i).getGuest().getId() == guestId){
+                        all.remove(i);
+                        writeAll(all, hostId);
+                        return true;
+                    }
+        }
+        return false;
+    }//deleteByParameters
 
     //HELPER METHODS
 
@@ -165,8 +174,8 @@ public class ReservationFileRepository implements ReservationRepository{
         return result;
     }//deserialize
 
-    private void writeAll(List<Reservation> reservations, String id) throws DataException {
-        try (PrintWriter writer = new PrintWriter(getFilePath(id))) {
+    private void writeAll(List<Reservation> reservations, String hostId) throws DataException {
+        try (PrintWriter writer = new PrintWriter(getFilePath(hostId))) {
 
             writer.println(HEADER);
 
@@ -187,5 +196,18 @@ public class ReservationFileRepository implements ReservationRepository{
         }
         return maxId+1;
     }//getNextId
+
+    @Override
+    public boolean trueIfMatchingParameters(String hostId, int guestId, LocalDate startDate, LocalDate endDate) throws DataException {
+        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+        for(Reservation reservation : all){
+            if(reservation.getStartDateOfStay().equals(startDate))
+                if(reservation.getEndDateOfStay().equals(endDate))
+                    if(reservation.getGuest().getId() == guestId){
+                        return true;
+                    }
+        }
+        return false;
+    }//trueIfMatchingParameters
 
 }//end

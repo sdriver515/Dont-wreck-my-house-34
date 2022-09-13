@@ -16,6 +16,7 @@ public class GuestFileRepository implements GuestRepository {
         this.filePath = filePath;
     }//filePathForGuestFileRepository
 
+    //READ
     @Override
     public List<Guest> findAllGuestsInFile() {
         ArrayList<Guest> result = new ArrayList<>();
@@ -35,6 +36,23 @@ public class GuestFileRepository implements GuestRepository {
         }
         return result;
     }//findAllGuestsInFile
+
+    @Override
+    public Guest findByGuestId(int idOfGuest) {
+        return findAllGuestsInFile().stream()
+                .filter(i -> i.getId() == idOfGuest)
+                .findFirst()
+                .orElse(null);
+    }//findById
+
+    @Override
+    public Guest findByGuestEmail(String emailOfGuest) {
+        return findAllGuestsInFile().stream()
+                .filter(i -> i.getEmailOfGuest().equalsIgnoreCase(emailOfGuest))
+                .findFirst()
+                .orElse(null);
+    }//findById
+
 
     //HELPER METHODS//
     private Guest deserialize(String[] fields) {

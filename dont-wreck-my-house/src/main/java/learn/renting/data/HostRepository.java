@@ -9,5 +9,9 @@ public interface HostRepository {
     List<Host> findAllHostsInFile();//findAllHostsInFile
 
 
+    Host findByHostId(String idOfHost)//findByIdOfHost
+    ;
 
+    Host findByHostEmail(String emailOfHost)//findByIdOfHost
+    ;
 }//end

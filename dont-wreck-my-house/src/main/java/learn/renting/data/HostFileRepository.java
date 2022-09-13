@@ -1,4 +1,5 @@
 package learn.renting.data;
+import learn.renting.models.Guest;
 import learn.renting.models.Host;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class HostFileRepository implements HostRepository {
@@ -36,6 +40,44 @@ public class HostFileRepository implements HostRepository {
         return result;
     }//findAllHostsInFile
 
+    @Override
+    public Host findByHostId(String idOfHost) {
+        return findAllHostsInFile().stream()
+                .filter(i -> i.getId().equalsIgnoreCase(idOfHost))
+                .findFirst()
+                .orElse(null);
+    }//findByHostId
+
+    @Override
+    public Host findByHostEmail(String emailOfHost) {
+        return findAllHostsInFile().stream()
+                .filter(i -> i.getEmailOfHost().equalsIgnoreCase(emailOfHost))
+                .findFirst()
+                .orElse(null);
+    }//findByIdOfHost
+
+    public Map<String, BigDecimal> findStandardRateOfHostById(Integer idOfHost){
+        List<Host> host = findAllHostsInFile();
+        Map<String, BigDecimal> map = new HashMap<>();
+        for(Host h:host) {
+            map.put(h.getId(),
+                    h.getStandardRateOfHost());
+        }
+        return map;
+    }//findStandardRateOfHostById
+
+    public Map<String, BigDecimal> findWeekendRateOfHostById(Integer idOfHost){
+        List<Host> host = findAllHostsInFile();
+        Map<String, BigDecimal> map = new HashMap<>();
+        for(Host h:host) {
+            map.put(h.getId(),
+                    h.getWeekendRateOfHost());
+        }
+        return map;
+    }//findWeekendRateOfHostById
+
+
+
     //HELPER METHODS//
     private Host deserialize(String[] fields) {
         Host result = new Host();
@@ -52,19 +94,19 @@ public class HostFileRepository implements HostRepository {
         return result;
     }//deserialize
 
-    private String serialize(Host host) {
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
-                host.getId(),
-                host.getLastNameOfHost(),
-                host.getEmailOfHost(),
-                host.getPhoneOfHost(),
-                host.getAddressOfHost(),
-                host.getCityOfHost(),
-                host.getStateOfHost(),
-                host.getPostalCodeOfHost(),
-                host.getStandardRateOfHost(),
-                host.getWeekendRateOfHost());
-    }//serialize
+//    private String serialize(Host host) {
+//        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
+//                host.getId(),
+//                host.getLastNameOfHost(),
+//                host.getEmailOfHost(),
+//                host.getPhoneOfHost(),
+//                host.getAddressOfHost(),
+//                host.getCityOfHost(),
+//                host.getStateOfHost(),
+//                host.getPostalCodeOfHost(),
+//                host.getStandardRateOfHost(),
+//                host.getWeekendRateOfHost());
+//    }//serialize
 
 
 

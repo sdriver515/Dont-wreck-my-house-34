@@ -1,7 +1,5 @@
 package learn.renting.data;
 
-import learn.renting.models.Guest;
-import learn.renting.models.Host;
 import learn.renting.models.Reservation;
 
 import java.math.BigDecimal;
@@ -23,9 +21,13 @@ public class ReservationRepositoryDouble implements ReservationRepository{
         reservations.add(reservation);
     }
 
+    @Override
+    public List<Reservation> findContentsOfReservationFileByHostId(String hostId) {
+        return null;
+    }
 
     @Override
-    public List<Reservation> findContentsOfReservationFileByHostId(String id) {
+    public Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
         return null;
     }
 
@@ -35,7 +37,22 @@ public class ReservationRepositoryDouble implements ReservationRepository{
     }
 
     @Override
-    public boolean update(Reservation reservation, Host host, Guest guest) throws DataException {
+    public boolean update(Reservation reservation, String hostId, int guestId) throws DataException {
+        return false;
+    }
+
+    @Override
+    public Reservation create(Reservation reservation, String hostId) throws DataException {
+        return null;
+    }
+
+    @Override
+    public boolean deleteByParameters(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
+        return false;
+    }
+
+    @Override
+    public boolean trueIfMatchingParameters(String hostId, int guestId, LocalDate startDate, LocalDate endDate) throws DataException {
         return false;
     }
 }//end
