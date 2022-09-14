@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -27,16 +26,19 @@ public class ReservationFileRepository implements ReservationRepository{
     @Override
     public Reservation create(Reservation reservation, String hostId) throws DataException {
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+        if (reservation != null){
         int nextId = getNextId(all);
         reservation.setId(nextId);
         all.add(reservation);
         writeAll(all, hostId);
         return reservation;
+        }
+        return null;
     }//create
 
     //READ
     @Override
-    public List<Reservation> findContentsOfReservationFileByHostId(String hostId) {
+    public List<Reservation> findContentsOfReservationFileByHostId(String hostId) throws DataException {
         ArrayList<Reservation> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(hostId)))) {
 
@@ -54,7 +56,7 @@ public class ReservationFileRepository implements ReservationRepository{
         return result;
     }//findContentsOfReservationFilesByHostId
 
-    public Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId){
+    public Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
         for(Reservation reservation : all){
             if(reservation.getStartDateOfStay().equals(startDate))
@@ -103,34 +105,45 @@ public class ReservationFileRepository implements ReservationRepository{
     }//findContentsOfAllReservationFiles
 
     @Override
-    public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) {
-//        public String returnOccupiedDatesOfHost(String hostId) {
+    public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) throws DataException {
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
         Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
         for(Reservation r : all){
             mapWithTimes.put(r.getStartDateOfStay(),
                     r.getEndDateOfStay());
         }
-//        String mapWithTimesString = Arrays.toString(mapWithTimes.entrySet().toArray());
         return mapWithTimes;
-    }//returnFreeDatesOfHost
+    }//returnOccupiedDatesOfHost
 
-//    @Override
-//    public LocalDate returnFutureReservations(LocalDate date, String hostId){
-//        Map<LocalDate, LocalDate> map = returnOccupiedDatesOfHost(hostId);
-//        LocalDate dateNow = LocalDate.now();
-//        Map<LocalDate, LocalDate> result = new HashMap<>();
-//
-//            for (LocalDate day : map.values()) {
-//                //if map key is after current date then:
-//                if(day.isAfter((ChronoLocalDate) map.keySet()){
-//                    //put into new map
-//                    result.put());//problem here
-//                }
-//
-//            }
-//            return null;
-//    }
+    @Override
+    public Map<LocalDate, LocalDate> returnFutureReservations(String hostId) throws DataException {
+        Map<LocalDate, LocalDate> map = returnOccupiedDatesOfHost(hostId);
+        Map<LocalDate, LocalDate> result = new HashMap<>();
+
+            for (LocalDate key : map.keySet()) {
+                if(trueIfInFuture(key)){
+                    result.put(key, map.get(key));
+                }
+            }
+            return result;
+    }//returnFutureReservations
+
+    @Override
+    public boolean trueIfWithinRange(LocalDate startDate, LocalDate endDate, LocalDate inputDate){
+            if (inputDate.isAfter(startDate) && inputDate.isBefore(endDate)){
+                return true;
+            }
+        return false;
+    }//trueIfWithinRange
+
+    @Override
+    public boolean trueIfInFuture(LocalDate startDate){
+        LocalDate dateNow = LocalDate.now();
+        if (startDate.isAfter(dateNow)){
+            return true;
+        }
+        return false;
+    }//trueIfInFuture
 
     @Override
     public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate){
@@ -171,7 +184,7 @@ public class ReservationFileRepository implements ReservationRepository{
 
     //UPDATE
     @Override
-    public boolean update(Reservation reservation, String hostId, int guestId) throws DataException {//problematic
+    public boolean update(Reservation reservation, String hostId, int guestId) throws DataException {
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).getGuest().getId() == (guestId)) {

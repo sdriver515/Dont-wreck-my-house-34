@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface ReservationRepository {
 
-    List<Reservation> findContentsOfReservationFileByHostId(String hostId);
+    List<Reservation> findContentsOfReservationFileByHostId(String hostId) throws DataException;
 
     Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException;
 
@@ -19,8 +19,14 @@ public interface ReservationRepository {
     Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) throws DataException//returnFreeDatesOfHost
     ;
 
-//    String returnOccupiedDatesOfHost(String hostId) throws DataException//returnFreeDatesOfHost
-//    ;
+    Map<LocalDate, LocalDate> returnFutureReservations(String hostId) throws DataException//returnFutureReservations
+    ;
+
+    boolean trueIfWithinRange(LocalDate startDate, LocalDate endDate, LocalDate inputDate)//trueIfWithinRange
+    ;
+
+    boolean trueIfInFuture(LocalDate startDate)//trueIfWithinRange
+    ;
 
     BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate)//returnCostOfStayAtHost
     ;

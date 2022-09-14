@@ -42,10 +42,21 @@ public class ReservationRepositoryDouble implements ReservationRepository{
     public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) throws DataException {
         return null;
     }
-//    @Override
-//    public String returnOccupiedDatesOfHost(String hostId) throws DataException {
-//        return null;
-//    }
+
+    @Override
+    public Map<LocalDate, LocalDate> returnFutureReservations(String hostId) {
+        return null;
+    }
+
+    @Override
+    public boolean trueIfWithinRange(LocalDate startDate, LocalDate endDate, LocalDate inputDate) {
+        return false;
+    }
+
+    @Override
+    public boolean trueIfInFuture(LocalDate startDate) {
+        return false;
+    }
 
     @Override
     public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate) {
