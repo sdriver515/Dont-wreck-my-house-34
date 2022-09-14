@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -114,6 +115,23 @@ public class ReservationFileRepository implements ReservationRepository{
         return mapWithTimes;
     }//returnFreeDatesOfHost
 
+//    @Override
+//    public LocalDate returnFutureReservations(LocalDate date, String hostId){
+//        Map<LocalDate, LocalDate> map = returnOccupiedDatesOfHost(hostId);
+//        LocalDate dateNow = LocalDate.now();
+//        Map<LocalDate, LocalDate> result = new HashMap<>();
+//
+//            for (LocalDate day : map.values()) {
+//                //if map key is after current date then:
+//                if(day.isAfter((ChronoLocalDate) map.keySet()){
+//                    //put into new map
+//                    result.put());//problem here
+//                }
+//
+//            }
+//            return null;
+//    }
+
     @Override
     public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate){
         int weekendCount = 0;
@@ -198,7 +216,7 @@ public class ReservationFileRepository implements ReservationRepository{
                 reservation.getId(),
                 reservation.getStartDateOfStay(),
                 reservation.getEndDateOfStay(),
-                reservation.getGuest().getId(),//do I want it like this?
+                reservation.getGuest().getId(),
                 reservation.getTotalCost());
     }//serialize
 
