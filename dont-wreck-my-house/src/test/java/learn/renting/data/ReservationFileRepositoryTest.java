@@ -42,6 +42,21 @@ public class ReservationFileRepositoryTest {
 
     //CREATE
 
+    @Test
+    void shouldCreate() throws DataException {
+        Reservation reservation = new Reservation();
+        reservation.setStartDateOfStay(LocalDate.of(2022, 11, 11));
+        reservation.setEndDateOfStay(LocalDate.of(2022, 11, 12));
+        reservation.setTotalCost(BigDecimal.valueOf(500));
+
+        Guest guest = new Guest();
+        guest.setId(12);
+        reservation.setGuest(guest);
+
+        reservation = repository.create(reservation, "4t17f96c-b8fe-4265-b4f1-304dea8762db");
+        System.out.println(reservation.getGuest().getId());
+    }
+
     //READ
     @Test
     void shouldFindById() {
