@@ -12,6 +12,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Repository
 public class ReservationFileRepository implements ReservationRepository{
@@ -123,29 +125,29 @@ public class ReservationFileRepository implements ReservationRepository{
         BigDecimal weekendRateOfHost = host.getWeekendRateOfHost();
         BigDecimal result = BigDecimal.ONE;
 
-        while(startDate.isBefore(endDate)){
-            if(startDate.getDayOfWeek() == DayOfWeek.FRIDAY){
-                weekendCount++;
-            }
-            if(startDate.getDayOfWeek()==DayOfWeek.SATURDAY){
-                weekdayCount++;
-            }
-            if(startDate.getDayOfWeek() == DayOfWeek.SUNDAY){
-                weekdayCount++;
-            }
-            if(startDate.getDayOfWeek() == DayOfWeek.MONDAY){
-                weekdayCount++;
-            }
-            if(startDate.getDayOfWeek() == DayOfWeek.TUESDAY){
-                weekdayCount++;
-            }
-            if(startDate.getDayOfWeek() == DayOfWeek.WEDNESDAY){
-                weekdayCount++;
-            }
-            if(startDate.getDayOfWeek() == DayOfWeek.THURSDAY){
-                weekdayCount++;
-            }
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Problems here. Something is null.");
         }
+
+        Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
+                || date.getDayOfWeek() == DayOfWeek.FRIDAY;
+
+        Predicate<LocalDate> isWeekday = date -> date.getDayOfWeek() == DayOfWeek.SUNDAY
+                || date.getDayOfWeek() == DayOfWeek.MONDAY
+                || date.getDayOfWeek() == DayOfWeek.TUESDAY
+                || date.getDayOfWeek() == DayOfWeek.WEDNESDAY
+                || date.getDayOfWeek() == DayOfWeek.THURSDAY;
+
+        List<LocalDate> weekdays = startDate.datesUntil(endDate)
+                .filter(isWeekend.negate())
+                .collect(Collectors.toList());
+
+        List<LocalDate> weekend = startDate.datesUntil(endDate)
+                .filter(isWeekday.negate())
+                .collect(Collectors.toList());
+
+        weekdayCount=weekdays.size();
+        weekendCount=weekend.size();
 
         BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
         BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
