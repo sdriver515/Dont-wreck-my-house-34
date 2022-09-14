@@ -73,6 +73,7 @@ public class ReservationRepositoryDouble implements ReservationRepository{
         return null;
     }
 
+
     @Override
     public boolean deleteByParameters(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
         return false;

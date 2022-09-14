@@ -37,6 +37,7 @@ public interface ReservationRepository {
     Reservation create(Reservation reservation, String hostId) throws DataException//create
     ;
 
+
     //DELETE
     boolean deleteByParameters(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException//deleteByParameters
     ;

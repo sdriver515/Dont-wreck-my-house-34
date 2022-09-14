@@ -186,11 +186,13 @@ public class ReservationFileRepository implements ReservationRepository{
     @Override
     public boolean update(Reservation reservation, String hostId, int guestId) throws DataException {
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        for (int i = 0; i < all.size(); i++) {
-            if (all.get(i).getGuest().getId() == (guestId)) {
-                all.set(i, reservation);
-                writeAll(all, hostId);
-                return true;
+        if (reservation != null){
+            for(int i = 0; i < all.size(); i++) {
+                if (all.get(i).getGuest().getId() == guestId) {
+                    all.set(i, reservation);
+                    writeAll(all, hostId);
+                    return true;
+                }
             }
         }
         return false;

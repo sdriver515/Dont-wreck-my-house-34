@@ -157,26 +157,22 @@ public class ReservationFileRepositoryTest {
     //UPDATE
     @Test
     public void shouldUpdate() throws DataException {
-        Reservation reservation = repository.findContentsOfReservationFileByHostId("2e72f86c-b8fe-4265-b4f1-304dea8762db").get(0);
-        reservation.setId(1);
-        reservation.setStartDateOfStay(LocalDate.of(2002, 4, 4));
-        reservation.setEndDateOfStay(LocalDate.of(2002, 5, 5));
-        reservation.setTotalCost(BigDecimal.valueOf(100));
+        Reservation update = new Reservation();
+        update.setId(2);
+        update.setStartDateOfStay(LocalDate.of(2002, 4, 4));
+        update.setEndDateOfStay(LocalDate.of(2002, 5, 5));
+        update.setTotalCost(BigDecimal.valueOf(100));
 
         Guest guest = new Guest();
         guest.setId(136);
-
-        reservation.setGuest(guest);
+        update.setGuest(guest);
 
         Host host = new Host();
         host.setId("2e72f86c-b8fe-4265-b4f1-304dea8762db");
 
-        boolean result = repository.update(reservation, host.getId(), guest.getId());
-
+        boolean result = repository.update(update, "2e72f86c-b8fe-4265-b4f1-304dea8762db", 136);
         assertTrue(result);
-
-        assertNotNull(reservation);
-        assertEquals(1, reservation.getId());
+        assertNotNull(update);
     }//shouldUpdate
 
     //DELETE
