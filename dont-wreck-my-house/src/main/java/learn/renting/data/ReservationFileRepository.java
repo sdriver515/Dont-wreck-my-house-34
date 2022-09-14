@@ -10,8 +10,7 @@ import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -66,18 +65,18 @@ public class ReservationFileRepository implements ReservationRepository{
         return null;
     }//findReservationByHostIdAndDatesAndGuestId
 
-    public List<Reservation> findFutureReservationsByHostIdAndDate(String hostId, LocalDate startDate) throws DataException {
-        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        List<Reservation> result = new ArrayList<>();
-        for(Reservation reservation : all) {
-            if (reservation.getStartDateOfStay().equals(startDate)) {
-                result.add(reservation);
-                writeAll(result, hostId);
-                return result;
-            }
-        }
-        return null;
-    }//findFutureReservationsByHostIdAndDate
+//    public List<Reservation> findFutureReservationsByHostIdAndDate(String hostId, LocalDate startDate) throws DataException {
+//        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+//        List<Reservation> result = new ArrayList<>();
+//        for(Reservation reservation : all) {
+//            if (reservation.getStartDateOfStay().equals(startDate)) {
+//                result.add(reservation);
+//                writeAll(result, hostId);
+//                return result;
+//            }
+//        }
+//        return null;
+//    }//findFutureReservationsByHostIdAndDate
 
     @Override
     public List<Reservation> findContentsOfAllReservationFiles() {
@@ -103,22 +102,20 @@ public class ReservationFileRepository implements ReservationRepository{
     }//findContentsOfAllReservationFiles
 
     @Override
-    public LocalDate returnFreeDatesOfHost(Reservation reservation, String hostId) throws DataException {
+    public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) {
+//        public String returnOccupiedDatesOfHost(String hostId) {
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        List<Reservation> result = new ArrayList<>();
-        LocalDate dateNow = LocalDate.now();
-        for(int i = 0; i < all.size(); i++){
-            if(all.get(i).getStartDateOfStay().isAfter(dateNow)){
-                result.set(i, reservation);
-                writeAll(result, hostId);
-            }
-            }
-        return null;
+        Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
+        for(Reservation r : all){
+            mapWithTimes.put(r.getStartDateOfStay(),
+                    r.getEndDateOfStay());
+        }
+//        String mapWithTimesString = Arrays.toString(mapWithTimes.entrySet().toArray());
+        return mapWithTimes;
     }//returnFreeDatesOfHost
 
     @Override
     public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate){
-        List<Reservation> all = findContentsOfReservationFileByHostId(host.getId());
         int weekendCount = 0;
         int weekdayCount = 0;
         BigDecimal standardRateOfHost = host.getStandardRateOfHost();
@@ -128,7 +125,6 @@ public class ReservationFileRepository implements ReservationRepository{
         if (startDate == null || endDate == null) {
             throw new IllegalArgumentException("Problems here. Something is null.");
         }
-
         Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
                 || date.getDayOfWeek() == DayOfWeek.FRIDAY;
 

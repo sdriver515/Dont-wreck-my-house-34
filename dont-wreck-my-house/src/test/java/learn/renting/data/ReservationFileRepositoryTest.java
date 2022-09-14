@@ -18,6 +18,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.FileHandler;
 import static java.nio.file.StandardCopyOption.*;
 
@@ -55,6 +56,28 @@ public class ReservationFileRepositoryTest {
         assertNotNull(list);
     }//shouldReturnFiles
 
+    @Test
+    void shouldReturnCorrectCostOfStay(){
+        List<Reservation> reservations = repository.findContentsOfReservationFileByHostId("2e72f86c-b8fe-4265-b4f1-304dea8762db");
+        BigDecimal result = repository.returnCostOfStayAtHost(new Host("2e72f86c-b8fe-4265-b4f1-304dea8762db", "Driver", BigDecimal.valueOf(100), BigDecimal.valueOf(150)), LocalDate.of(2022, 9, 12), LocalDate.of(2022, 9, 17));
+        assertNotNull(result);
+        assertEquals(BigDecimal.valueOf(550), result);
+        result = repository.returnCostOfStayAtHost(new Host("2e72f86c-b8fe-4265-b4f1-304dea8762db", "Driver", BigDecimal.valueOf(100), BigDecimal.valueOf(150)), LocalDate.of(2022, 9, 12), LocalDate.of(2022, 9, 15));
+        assertEquals(BigDecimal.valueOf(300), result);
+    }//shouldReturnCorrectCostOfStay
+
+    @Test
+    void shouldReturnOccupiedDaysOfHost(){
+        Map<LocalDate, LocalDate> occupiedDatesOfHost = repository.returnOccupiedDatesOfHost("2e72f86c-b8fe-4265-b4f1-304dea8762db");
+//        String occupiedDatesOfHost = repository.returnOccupiedDatesOfHost("2e72f86c-b8fe-4265-b4f1-304dea8762db");
+        System.out.println(occupiedDatesOfHost);
+        LocalDate date = occupiedDatesOfHost.get(LocalDate.of(2023, 1, 12));
+        assertEquals(LocalDate.of(2023, 1, 18), date);
+        for (LocalDate key: occupiedDatesOfHost.keySet()){
+            System.out.println(key+ " to " + occupiedDatesOfHost.get(key));
+        }
+    }//shouldReturnOccupiedDaysOfHost
+
     //UPDATE
 //    @Test
 //    public void shouldUpdate() throws DataException {
@@ -81,16 +104,5 @@ public class ReservationFileRepositoryTest {
 //    }//shouldUpdate
 
     //DELETE
-
-    //HELPER METHODS
-    @Test
-    void shouldReturnCorrectCostOfStay(){
-        List<Reservation> reservations = repository.findContentsOfReservationFileByHostId("2e72f86c-b8fe-4265-b4f1-304dea8762db");
-        BigDecimal result = repository.returnCostOfStayAtHost(new Host("2e72f86c-b8fe-4265-b4f1-304dea8762db", "Driver", BigDecimal.valueOf(100), BigDecimal.valueOf(150)), LocalDate.of(2022, 9, 12), LocalDate.of(2022, 9, 17));
-        assertNotNull(result);
-        assertEquals(BigDecimal.valueOf(550), result);
-        result = repository.returnCostOfStayAtHost(new Host("2e72f86c-b8fe-4265-b4f1-304dea8762db", "Driver", BigDecimal.valueOf(100), BigDecimal.valueOf(150)), LocalDate.of(2022, 9, 12), LocalDate.of(2022, 9, 15));
-        assertEquals(BigDecimal.valueOf(300), result);
-    }//shouldReturnCorrectCostOfStay
 
 }//end

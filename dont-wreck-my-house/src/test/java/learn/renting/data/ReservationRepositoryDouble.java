@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ReservationRepositoryDouble implements ReservationRepository{
 
@@ -38,9 +39,13 @@ public class ReservationRepositoryDouble implements ReservationRepository{
     }
 
     @Override
-    public LocalDate returnFreeDatesOfHost(Reservation reservation, String hostId) throws DataException {
+    public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) throws DataException {
         return null;
     }
+//    @Override
+//    public String returnOccupiedDatesOfHost(String hostId) throws DataException {
+//        return null;
+//    }
 
     @Override
     public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate) {
