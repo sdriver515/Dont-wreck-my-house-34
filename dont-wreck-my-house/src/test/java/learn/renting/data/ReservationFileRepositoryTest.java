@@ -82,4 +82,12 @@ public class ReservationFileRepositoryTest {
 
     //DELETE
 
+    //HELPER METHODS
+    @Test
+    void shouldReturnCorrectCostOfStay(){
+        List<Reservation> reservations = repository.findContentsOfReservationFileByHostId("2e72f86c-b8fe-4265-b4f1-304dea8762db");
+        BigDecimal result = repository.returnCostOfStayAtHost(new Host("2e72f86c-b8fe-4265-b4f1-304dea8762db", "Driver", BigDecimal.valueOf(100), BigDecimal.valueOf(150)), LocalDate.of(2002, 05, 15), LocalDate.of(2002, 05, 20));
+        System.out.println(result);
+    }
+
 }//end

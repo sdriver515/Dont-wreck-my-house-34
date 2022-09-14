@@ -1,5 +1,6 @@
 package learn.renting.data;
 import learn.renting.models.Guest;
+import learn.renting.models.Host;
 import learn.renting.models.Reservation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,15 +64,18 @@ public class ReservationFileRepository implements ReservationRepository{
         return null;
     }//findReservationByHostIdAndDatesAndGuestId
 
-    public Reservation findFutureReservationByHostIdAndDate(String hostId, LocalDate startDate){
+    public List<Reservation> findFutureReservationsByHostIdAndDate(String hostId, LocalDate startDate) throws DataException {
         List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+        List<Reservation> result = new ArrayList<>();
         for(Reservation reservation : all) {
             if (reservation.getStartDateOfStay().equals(startDate)) {
-                return reservation;
+                result.add(reservation);
+                writeAll(result, hostId);
+                return result;
             }
         }
         return null;
-    }//findFutureReservationByHostIdAndDate
+    }//findFutureReservationsByHostIdAndDate
 
     @Override
     public List<Reservation> findContentsOfAllReservationFiles() {
@@ -94,6 +99,59 @@ public class ReservationFileRepository implements ReservationRepository{
                 } }while (count < result.size());
         }return result;
     }//findContentsOfAllReservationFiles
+
+    @Override
+    public LocalDate returnFreeDatesOfHost(Reservation reservation, String hostId) throws DataException {
+        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+        List<Reservation> result = new ArrayList<>();
+        LocalDate dateNow = LocalDate.now();
+        for(int i = 0; i < all.size(); i++){
+            if(all.get(i).getStartDateOfStay().isAfter(dateNow)){
+                result.set(i, reservation);
+                writeAll(result, hostId);
+            }
+            }
+        return null;
+    }//returnFreeDatesOfHost
+
+    @Override
+    public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate){
+        List<Reservation> all = findContentsOfReservationFileByHostId(host.getId());
+        int weekendCount = 0;
+        int weekdayCount = 0;
+        BigDecimal standardRateOfHost = host.getStandardRateOfHost();
+        BigDecimal weekendRateOfHost = host.getWeekendRateOfHost();
+        BigDecimal result = BigDecimal.ONE;
+
+        while(startDate.isBefore(endDate)){
+            if(startDate.getDayOfWeek() == DayOfWeek.FRIDAY){
+                weekendCount++;
+            }
+            if(startDate.getDayOfWeek()==DayOfWeek.SATURDAY){
+                weekdayCount++;
+            }
+            if(startDate.getDayOfWeek() == DayOfWeek.SUNDAY){
+                weekdayCount++;
+            }
+            if(startDate.getDayOfWeek() == DayOfWeek.MONDAY){
+                weekdayCount++;
+            }
+            if(startDate.getDayOfWeek() == DayOfWeek.TUESDAY){
+                weekdayCount++;
+            }
+            if(startDate.getDayOfWeek() == DayOfWeek.WEDNESDAY){
+                weekdayCount++;
+            }
+            if(startDate.getDayOfWeek() == DayOfWeek.THURSDAY){
+                weekdayCount++;
+            }
+        }
+
+        BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
+        BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
+        result = weekendCostResult.add(weekdayCostResult);
+        return  result;
+    }//returnCostOfStayAtHost
 
     //UPDATE
     @Override

@@ -93,6 +93,13 @@ public class Host {
         this.postalCodeOfHost = postalCodeOfHost;
         this.standardRateOfHost = standardRateOfHost;
         this.weekendRateOfHost = weekendRateOfHost;
-    }//Guest
+    }//Host
+
+    public Host(String id, String lastNameOfHost, BigDecimal standardRateOfHost, BigDecimal weekendRateOfHost){
+        this.id = id;
+        this.lastNameOfHost = lastNameOfHost;
+        this.standardRateOfHost = standardRateOfHost;
+        this.weekendRateOfHost = weekendRateOfHost;
+    }
 
 }//end

@@ -4,6 +4,7 @@ import learn.renting.models.Guest;
 import learn.renting.models.Host;
 import learn.renting.models.Reservation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,12 @@ public interface ReservationRepository {
     Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException;
 
     List<Reservation> findContentsOfAllReservationFiles();
+
+    LocalDate returnFreeDatesOfHost(Reservation reservation, String hostId) throws DataException//returnFreeDatesOfHost
+    ;
+
+    BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate)//returnCostOfStayAtHost
+    ;
 
     //UPDATE
     boolean update(Reservation reservation, String hostId, int guestId) throws DataException;

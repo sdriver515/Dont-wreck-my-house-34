@@ -1,5 +1,6 @@
 package learn.renting.data;
 
+import learn.renting.models.Host;
 import learn.renting.models.Reservation;
 
 import java.math.BigDecimal;
@@ -33,6 +34,16 @@ public class ReservationRepositoryDouble implements ReservationRepository{
 
     @Override
     public List<Reservation> findContentsOfAllReservationFiles() {
+        return null;
+    }
+
+    @Override
+    public LocalDate returnFreeDatesOfHost(Reservation reservation, String hostId) throws DataException {
+        return null;
+    }
+
+    @Override
+    public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate) {
         return null;
     }
 

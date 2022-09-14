@@ -22,7 +22,7 @@ public class GuestFileRepository implements GuestRepository {
         ArrayList<Guest> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
-            reader.readLine(); // read header
+            reader.readLine();
 
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 
