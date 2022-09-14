@@ -24,23 +24,23 @@ public class ReservationFileRepository implements ReservationRepository{
 
     //CREATE
     @Override
-    public Reservation create(Reservation reservation, String hostId) throws DataException {
-        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        if (reservation != null){
+    public Reservation add(Reservation reservation) throws DataException {
+        List<Reservation> all = findByHost(reservation.getHost());
         int nextId = getNextId(all);
         reservation.setId(nextId);
         all.add(reservation);
-        writeAll(all, hostId);
+        writeAll(all, reservation.getHost());
         return reservation;
-        }
-        return null;
-    }//create
+    }//add
 
     //READ
     @Override
-    public List<Reservation> findContentsOfReservationFileByHostId(String hostId) throws DataException {
+    public List<Reservation> findByHost(Host host) throws DataException {
         ArrayList<Reservation> result = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(hostId)))) {
+        if (host==null||host.getId().isBlank()||host.getId()==null){
+            return result;
+        }
+        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(host)))) {
 
             reader.readLine();
 
@@ -48,25 +48,13 @@ public class ReservationFileRepository implements ReservationRepository{
 
                 String[] fields = line.split(",", -1);
                 if (fields.length == 5) {
-                    result.add(deserialize(fields, hostId));
+                    result.add(deserialize(fields, host));
                 }
             }
         } catch (IOException ex) {
         }
         return result;
-    }//findContentsOfReservationFilesByHostId
-
-    public Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
-        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        for(Reservation reservation : all){
-            if(reservation.getStartDateOfStay().equals(startDate))
-                if(reservation.getEndDateOfStay() == endDate)
-                    if(reservation.getGuest().getId() == guestId){
-                        return reservation;
-                    }
-        }
-        return null;
-    }//findReservationByHostIdAndDatesAndGuestId
+    }//findByHostId
 
 //    public List<Reservation> findFutureReservationsByHostIdAndDate(String hostId, LocalDate startDate) throws DataException {
 //        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
@@ -81,143 +69,139 @@ public class ReservationFileRepository implements ReservationRepository{
 //        return null;
 //    }//findFutureReservationsByHostIdAndDate
 
-    @Override
-    public List<Reservation> findContentsOfAllReservationFiles() {
-        File[] filesList = returnDirectoryFilesList();
-        List<Reservation> result = new ArrayList<>();
-        int count = 0;
+//    @Override
+//    public List<Reservation> findContentsOfAllReservationFiles() {
+//        File[] filesList = returnDirectoryFilesList();
+//        List<Reservation> result = new ArrayList<>();
+//        int count = 0;
+//
+//        for(int i = 0; i< filesList.length; i++){
+//            String fileName = "./dont-wreck-my-house-data/reservations/" + (filesList[i].getName());
+//            do{
+//                try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+//                    reader.readLine();
+//                    for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+//                        String[] fields = line.split(",", -1);
+//                        if (fields.length == 5) {
+//                            result.add(deserializeReservationFile(fields));
+//                            count ++;
+//                        }
+//                    }
+//                } catch (IOException ex) {
+//                } }while (count < result.size());
+//        }return result;
+//    }//findContentsOfAllReservationFiles
 
-        for(int i = 0; i< filesList.length; i++){
-            String fileName = "./dont-wreck-my-house-data/reservations/" + (filesList[i].getName());
-            do{
-                try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-                    reader.readLine();
-                    for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                        String[] fields = line.split(",", -1);
-                        if (fields.length == 5) {
-                            result.add(deserializeReservationFile(fields));
-                            count ++;
-                        }
-                    }
-                } catch (IOException ex) {
-                } }while (count < result.size());
-        }return result;
-    }//findContentsOfAllReservationFiles
+//    @Override
+//    public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) throws DataException {
+//        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+//        Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
+//        for(Reservation r : all){
+//            mapWithTimes.put(r.getStartDateOfStay(),
+//                    r.getEndDateOfStay());
+//        }
+//        return mapWithTimes;
+//    }//returnOccupiedDatesOfHost
 
-    @Override
-    public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) throws DataException {
-        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
-        for(Reservation r : all){
-            mapWithTimes.put(r.getStartDateOfStay(),
-                    r.getEndDateOfStay());
-        }
-        return mapWithTimes;
-    }//returnOccupiedDatesOfHost
+//    @Override
+//    public Map<LocalDate, LocalDate> returnFutureReservations(String hostId) throws DataException {
+//        Map<LocalDate, LocalDate> map = returnOccupiedDatesOfHost(hostId);
+//        Map<LocalDate, LocalDate> result = new HashMap<>();
+//
+//            for (LocalDate key : map.keySet()) {
+//                if(trueIfInFuture(key)){
+//                    result.put(key, map.get(key));
+//                }
+//            }
+//            return result;
+//    }//returnFutureReservations
 
-    @Override
-    public Map<LocalDate, LocalDate> returnFutureReservations(String hostId) throws DataException {
-        Map<LocalDate, LocalDate> map = returnOccupiedDatesOfHost(hostId);
-        Map<LocalDate, LocalDate> result = new HashMap<>();
+//    @Override
+//    public boolean trueIfWithinRange(LocalDate startDate, LocalDate endDate, LocalDate inputDate){
+//            if (inputDate.isAfter(startDate) && inputDate.isBefore(endDate)){
+//                return true;
+//            }
+//        return false;
+//    }//trueIfWithinRange
 
-            for (LocalDate key : map.keySet()) {
-                if(trueIfInFuture(key)){
-                    result.put(key, map.get(key));
-                }
-            }
-            return result;
-    }//returnFutureReservations
+//    @Override
+//    public boolean trueIfInFuture(LocalDate startDate){
+//        LocalDate dateNow = LocalDate.now();
+//        if (startDate.isAfter(dateNow)){
+//            return true;
+//        }
+//        return false;
+//    }//trueIfInFuture
 
-    @Override
-    public boolean trueIfWithinRange(LocalDate startDate, LocalDate endDate, LocalDate inputDate){
-            if (inputDate.isAfter(startDate) && inputDate.isBefore(endDate)){
-                return true;
-            }
-        return false;
-    }//trueIfWithinRange
-
-    @Override
-    public boolean trueIfInFuture(LocalDate startDate){
-        LocalDate dateNow = LocalDate.now();
-        if (startDate.isAfter(dateNow)){
-            return true;
-        }
-        return false;
-    }//trueIfInFuture
-
-    @Override
-    public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate){
-        int weekendCount = 0;
-        int weekdayCount = 0;
-        BigDecimal standardRateOfHost = host.getStandardRateOfHost();
-        BigDecimal weekendRateOfHost = host.getWeekendRateOfHost();
-        BigDecimal result = BigDecimal.ONE;
-
-        if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Problems here. Something is null.");
-        }
-        Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
-                || date.getDayOfWeek() == DayOfWeek.FRIDAY;
-
-        Predicate<LocalDate> isWeekday = date -> date.getDayOfWeek() == DayOfWeek.SUNDAY
-                || date.getDayOfWeek() == DayOfWeek.MONDAY
-                || date.getDayOfWeek() == DayOfWeek.TUESDAY
-                || date.getDayOfWeek() == DayOfWeek.WEDNESDAY
-                || date.getDayOfWeek() == DayOfWeek.THURSDAY;
-
-        List<LocalDate> weekdays = startDate.datesUntil(endDate)
-                .filter(isWeekend.negate())
-                .collect(Collectors.toList());
-
-        List<LocalDate> weekend = startDate.datesUntil(endDate)
-                .filter(isWeekday.negate())
-                .collect(Collectors.toList());
-
-        weekdayCount=weekdays.size();
-        weekendCount=weekend.size();
-
-        BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
-        BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
-        result = weekendCostResult.add(weekdayCostResult);
-        return  result;
-    }//returnCostOfStayAtHost
+//    @Override
+//    public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate){
+//        int weekendCount = 0;
+//        int weekdayCount = 0;
+//        BigDecimal standardRateOfHost = host.getStandardRateOfHost();
+//        BigDecimal weekendRateOfHost = host.getWeekendRateOfHost();
+//        BigDecimal result = BigDecimal.ONE;
+//
+//        if (startDate == null || endDate == null) {
+//            throw new IllegalArgumentException("Problems here. Something is null.");
+//        }
+//        Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
+//                || date.getDayOfWeek() == DayOfWeek.FRIDAY;
+//
+//        Predicate<LocalDate> isWeekday = date -> date.getDayOfWeek() == DayOfWeek.SUNDAY
+//                || date.getDayOfWeek() == DayOfWeek.MONDAY
+//                || date.getDayOfWeek() == DayOfWeek.TUESDAY
+//                || date.getDayOfWeek() == DayOfWeek.WEDNESDAY
+//                || date.getDayOfWeek() == DayOfWeek.THURSDAY;
+//
+//        List<LocalDate> weekdays = startDate.datesUntil(endDate)
+//                .filter(isWeekend.negate())
+//                .collect(Collectors.toList());
+//
+//        List<LocalDate> weekend = startDate.datesUntil(endDate)
+//                .filter(isWeekday.negate())
+//                .collect(Collectors.toList());
+//
+//        weekdayCount=weekdays.size();
+//        weekendCount=weekend.size();
+//
+//        BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
+//        BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
+//        result = weekendCostResult.add(weekdayCostResult);
+//        return  result;
+//    }//returnCostOfStayAtHost
 
     //UPDATE
     @Override
-    public boolean update(Reservation reservation, String hostId, int guestId) throws DataException {
-        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        if (reservation != null){
+    public boolean updateReservation(Reservation reservation) throws DataException {
+        List<Reservation> all = findByHost(reservation.getHost());
             for(int i = 0; i < all.size(); i++) {
-                if (all.get(i).getGuest().getId() == guestId) {
+                if (all.get(i).getId() == reservation.getId()) {
                     all.set(i, reservation);
-                    writeAll(all, hostId);
+                    writeAll(all, reservation.getHost());
                     return true;
                 }
             }
-        }
         return false;
     }//update
 
     //DELETE
     @Override
-    public boolean deleteByParameters(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
-        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+    public boolean deleteReservation(Reservation reservation) throws DataException {
+        List<Reservation> all = findByHost(reservation.getHost());
         for(int i = 0; i < all.size(); i++){
-            if(all.get(i).getStartDateOfStay().equals(startDate))
-                if(all.get(i).getEndDateOfStay().equals(endDate))
-                    if(all.get(i).getGuest().getId() == guestId){
+            if(all.get(i).getId()== reservation.getId()) {
                         all.remove(i);
-                        writeAll(all, hostId);
+                        writeAll(all, reservation.getHost());
                         return true;
                     }
         }
         return false;
-    }//deleteByParameters
+    }//deleteReservation
 
     //HELPER METHODS
 
-    private String getFilePath(String id) {
-        return Paths.get(directory, id + ".csv").toString();
+    private String getFilePath(Host host) {
+        return Paths.get(directory, host.getId() + ".csv").toString();
     }//getFilePath
 
     private File[] returnDirectoryFilesList() {
@@ -235,36 +219,38 @@ public class ReservationFileRepository implements ReservationRepository{
                 reservation.getTotalCost());
     }//serialize
 
-    private Reservation deserializeReservationFile(String[] fields) {
+//    private Reservation deserializeReservationFile(String[] fields) {
+//        Reservation result = new Reservation();
+//        result.setId(Integer.parseInt(fields[0]));
+//        result.setStartDateOfStay(LocalDate.parse((fields[1])));
+//        result.setEndDateOfStay(LocalDate.parse((fields[2])));
+//        result.setTotalCost(new BigDecimal((fields[4])));
+//
+//        Guest guest = new Guest();
+//        guest.setId(Integer.parseInt(fields[3]));
+//        result.setGuest(guest);
+//
+//        return result;
+//    }//deserializeForageFile
+
+    private Reservation deserialize(String[] fields, Host host) {
         Reservation result = new Reservation();
         result.setId(Integer.parseInt(fields[0]));
+        result.setHost(host);
         result.setStartDateOfStay(LocalDate.parse((fields[1])));
         result.setEndDateOfStay(LocalDate.parse((fields[2])));
-        result.setTotalCost(new BigDecimal((fields[4])));
+        result.setTotalCost(BigDecimal.valueOf(Double.parseDouble(fields[4])));
 
         Guest guest = new Guest();
-        guest.setId(Integer.parseInt(fields[3]));
         result.setGuest(guest);
 
-        return result;
-    }//deserializeForageFile
-
-    private Reservation deserialize(String[] fields, String id) {
-        Reservation result = new Reservation();
-        result.setId(Integer.parseInt(fields[0]));
-        result.setStartDateOfStay(LocalDate.parse((fields[1])));
-        result.setEndDateOfStay(LocalDate.parse((fields[2])));
-        result.setTotalCost(new BigDecimal((fields[4])));
-
-        Guest guest = new Guest();
         guest.setId(Integer.parseInt(fields[3]));
-        result.setGuest(guest);
 
         return result;
     }//deserialize
 
-    private void writeAll(List<Reservation> reservations, String hostId) throws DataException {
-        try (PrintWriter writer = new PrintWriter(getFilePath(hostId))) {
+    private void writeAll(List<Reservation> reservations, Host host) throws DataException {
+        try (PrintWriter writer = new PrintWriter(getFilePath(host))) {
 
             writer.println(HEADER);
 
@@ -286,17 +272,17 @@ public class ReservationFileRepository implements ReservationRepository{
         return maxId+1;
     }//getNextId
 
-    @Override
-    public boolean trueIfMatchingParameters(String hostId, int guestId, LocalDate startDate, LocalDate endDate) throws DataException {
-        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-        for(Reservation reservation : all){
-            if(reservation.getStartDateOfStay().equals(startDate))
-                if(reservation.getEndDateOfStay().equals(endDate))
-                    if(reservation.getGuest().getId() == guestId){
-                        return true;
-                    }
-        }
-        return false;
-    }//trueIfMatchingParameters
+//    @Override
+//    public boolean trueIfMatchingParameters(String hostId, int guestId, LocalDate startDate, LocalDate endDate) throws DataException {
+//        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
+//        for(Reservation reservation : all){
+//            if(reservation.getStartDateOfStay().equals(startDate))
+//                if(reservation.getEndDateOfStay().equals(endDate))
+//                    if(reservation.getGuest().getId() == guestId){
+//                        return true;
+//                    }
+//        }
+//        return false;
+//    }//trueIfMatchingParameters
 
 }//end

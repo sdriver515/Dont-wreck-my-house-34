@@ -18,7 +18,7 @@ public class GuestFileRepository implements GuestRepository {
 
     //READ
     @Override
-    public List<Guest> findAllGuestsInFile() {
+    public List<Guest> findAll() {
         ArrayList<Guest> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
@@ -32,26 +32,25 @@ public class GuestFileRepository implements GuestRepository {
                 }
             }
         } catch (IOException ex) {
-            // don't throw on read
         }
         return result;
     }//findAllGuestsInFile
 
     @Override
-    public Guest findByGuestId(int idOfGuest) {
-        return findAllGuestsInFile().stream()
+    public Guest findById(int idOfGuest) {
+        return findAll().stream()
                 .filter(i -> i.getId() == idOfGuest)
                 .findFirst()
                 .orElse(null);
     }//findById
 
-    @Override
-    public Guest findByGuestEmail(String emailOfGuest) {
-        return findAllGuestsInFile().stream()
-                .filter(i -> i.getEmailOfGuest().equalsIgnoreCase(emailOfGuest))
-                .findFirst()
-                .orElse(null);
-    }//findById
+//    @Override
+//    public Guest findByGuestEmail(String emailOfGuest) {
+//        return findAllGuestsInFile().stream()
+//                .filter(i -> i.getEmailOfGuest().equalsIgnoreCase(emailOfGuest))
+//                .findFirst()
+//                .orElse(null);
+//    }//findById
 
 
     //HELPER METHODS//
@@ -66,14 +65,14 @@ public class GuestFileRepository implements GuestRepository {
         return result;
     }//deserialize
 
-    private String serialize(Guest guest) {
-        return String.format("%s,%s,%s,%s,%s,%s",
-                guest.getId(),
-                guest.getFirstNameOfGuest(),
-                guest.getLastNameOfGuest(),
-                guest.getEmailOfGuest(),
-                guest.getPhoneOfGuest(),
-                guest.getStateOfGuest());
-    }//serialize
+//    private String serialize(Guest guest) {
+//        return String.format("%s,%s,%s,%s,%s,%s",
+//                guest.getId(),
+//                guest.getFirstNameOfGuest(),
+//                guest.getLastNameOfGuest(),
+//                guest.getEmailOfGuest(),
+//                guest.getPhoneOfGuest(),
+//                guest.getStateOfGuest());
+//    }//serialize
 
 }//end

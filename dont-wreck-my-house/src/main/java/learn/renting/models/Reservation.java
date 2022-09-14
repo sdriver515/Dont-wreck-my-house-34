@@ -13,8 +13,26 @@ public class Reservation {
     private LocalDate endDateOfStay;
     private Guest guest;
     private BigDecimal totalCost;
+    private Host host;
 
-    //GETTERS AND SETTERS
+    public Reservation(int id, LocalDate startDateOfStay, LocalDate endDateOfStay, Guest guest, BigDecimal totalCost, Host host) {
+        this.id = id;
+        this.startDateOfStay = startDateOfStay;
+        this.endDateOfStay = endDateOfStay;
+        this.guest = guest;
+        this.totalCost = totalCost;
+        this.host = host;
+    }
+
+//GETTERS AND SETTERS
+
+    public Host getHost() {
+        return host;
+    }
+
+    public void setHost(Host host) {
+        this.host = host;
+    }
 
     public int getId() {
         return id;

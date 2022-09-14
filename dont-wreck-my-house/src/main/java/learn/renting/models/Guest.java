@@ -11,6 +11,17 @@ public class Guest {
     private String phoneOfGuest;
     private String stateOfGuest;
 
+    //CONSTRUCTORS
+    public Guest(){}
+    public Guest(int id, String firstNameOfGuest, String lastNameOfGuest, String emailOfGuest, String phoneOfGuest, String stateOfGuest) {
+        this.id = id;
+        this.firstNameOfGuest = firstNameOfGuest;
+        this.lastNameOfGuest = lastNameOfGuest;
+        this.emailOfGuest = emailOfGuest;
+        this.phoneOfGuest = phoneOfGuest;
+        this.stateOfGuest = stateOfGuest;
+    }//Guest
+
     //GETTERS AND SETTERS
     public int getId() {
         return id;
@@ -48,17 +59,6 @@ public class Guest {
     public void setStateOfGuest(String stateOfGuest) {
         this.stateOfGuest = stateOfGuest;
     }
-
-    //CONSTRUCTORS
-    public Guest(){}
-    public Guest(int id, String firstNameOfGuest, String lastNameOfGuest, String emailOfGuest, String phoneOfGuest, String stateOfGuest) {
-        this.id = id;
-        this.firstNameOfGuest = firstNameOfGuest;
-        this.lastNameOfGuest = lastNameOfGuest;
-        this.emailOfGuest = emailOfGuest;
-        this.phoneOfGuest = phoneOfGuest;
-        this.stateOfGuest = stateOfGuest;
-    }//Guest
 
     @Override
     public boolean equals(Object o) {

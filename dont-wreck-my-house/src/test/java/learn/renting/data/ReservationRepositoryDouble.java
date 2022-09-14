@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ReservationRepositoryDouble implements ReservationRepository{
 
@@ -20,67 +21,32 @@ public class ReservationRepositoryDouble implements ReservationRepository{
         reservation.setEndDateOfStay(LocalDate.of(2002, 5, 6));
         reservation.setGuest(GuestRepositoryDouble.GUEST);
         reservation.setTotalCost(BigDecimal.valueOf(200));
+        reservation.setHost(HostRepositoryDouble.HOST);
         reservations.add(reservation);
     }
 
     @Override
-    public List<Reservation> findContentsOfReservationFileByHostId(String hostId) {
-        return null;
-    }
+    public List<Reservation> findByHost(Host host) throws DataException {
+        return reservations.stream()
+                .filter(i -> i.getHost().getId().equals(host))
+                .collect(Collectors.toList());
+    }//findByHost
 
     @Override
-    public Reservation findReservationByHostIdAndDatesAndGuestId(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
-        return null;
-    }
+    public Reservation add(Reservation reservation) throws DataException {
+        reservation.setId(2);
+        reservations.add(reservation);
+        return reservation;
+    }//add
 
     @Override
-    public List<Reservation> findContentsOfAllReservationFiles() {
-        return null;
-    }
+    public boolean updateReservation(Reservation reservation) throws DataException {
+        return reservation.getId() > 0;
+    }//updateReservation
 
     @Override
-    public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(String hostId) throws DataException {
-        return null;
-    }
+    public boolean deleteReservation(Reservation reservation) throws DataException {
+        return reservation.getId() != 999;
+    }//deleteReservation
 
-    @Override
-    public Map<LocalDate, LocalDate> returnFutureReservations(String hostId) {
-        return null;
-    }
-
-    @Override
-    public boolean trueIfWithinRange(LocalDate startDate, LocalDate endDate, LocalDate inputDate) {
-        return false;
-    }
-
-    @Override
-    public boolean trueIfInFuture(LocalDate startDate) {
-        return false;
-    }
-
-    @Override
-    public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate) {
-        return null;
-    }
-
-    @Override
-    public boolean update(Reservation reservation, String hostId, int guestId) throws DataException {
-        return false;
-    }
-
-    @Override
-    public Reservation create(Reservation reservation, String hostId) throws DataException {
-        return null;
-    }
-
-
-    @Override
-    public boolean deleteByParameters(String hostId, LocalDate startDate, LocalDate endDate, int guestId) throws DataException {
-        return false;
-    }
-
-    @Override
-    public boolean trueIfMatchingParameters(String hostId, int guestId, LocalDate startDate, LocalDate endDate) throws DataException {
-        return false;
-    }
 }//end

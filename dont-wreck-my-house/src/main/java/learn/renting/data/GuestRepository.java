@@ -6,12 +6,8 @@ import learn.renting.models.Guest;
 import java.util.List;
 
 public interface GuestRepository {
-    List<Guest> findAllGuestsInFile();//findAllGuestsInFile
+    List<Guest> findAll();
 
+    Guest findById(int idOfGuest);
 
-    Guest findByGuestId(int idOfGuest)//findById
-    ;
-
-    Guest findByGuestEmail(String emailOfGuest)//findById
-    ;
 }//end

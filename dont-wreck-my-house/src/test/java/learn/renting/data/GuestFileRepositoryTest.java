@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GuestFileRepositoryTest {
     private static final String SEED_FILE_PATH = "./dont-wreck-my-house-data/test-guests-seed.csv";
@@ -31,7 +31,33 @@ public class GuestFileRepositoryTest {
 
     @Test
     void shouldFindAllGuests() {
-        List<Guest> all = repository.findAllGuestsInFile();
+        List<Guest> all = repository.findAll();
+        assertNotNull(all);
         assertEquals(4, all.size());
+        Guest guest = all.get(0);
+        assertEquals(1, guest.getId());
+        assertEquals("Sullivan", guest.getFirstNameOfGuest());
+        assertEquals("Lomas", guest.getLastNameOfGuest());
+        assertEquals("slomas0@mediafire.com", guest.getEmailOfGuest());
+        assertEquals("(702) 7768761", guest.getPhoneOfGuest());
+        assertEquals("NV", guest.getStateOfGuest());
     }//shouldFindAllGuests
+
+    @Test
+    void shouldFindGuestById(){
+        Guest guest = repository.findById(1);
+        assertEquals(1, guest.getId());
+        assertEquals("Sullivan", guest.getFirstNameOfGuest());
+        assertEquals("Lomas", guest.getLastNameOfGuest());
+        assertEquals("slomas0@mediafire.com", guest.getEmailOfGuest());
+        assertEquals("(702) 7768761", guest.getPhoneOfGuest());
+        assertEquals("NV", guest.getStateOfGuest());
+    }//shouldFindGuestById
+
+    @Test
+    void shouldNotFindNonExistentGuestId(){
+        Guest guest = repository.findById(10000);
+        assertNull(guest);
+    }//shouldNotFindNonExistentGuestId
+
 }//end

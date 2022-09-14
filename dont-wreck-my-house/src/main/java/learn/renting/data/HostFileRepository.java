@@ -22,7 +22,7 @@ public class HostFileRepository implements HostRepository {
     }//filepathForHostFileRepository
 
     @Override
-    public List<Host> findAllHostsInFile() {
+    public List<Host> findAll() {
         ArrayList<Host> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
@@ -38,45 +38,43 @@ public class HostFileRepository implements HostRepository {
         } catch (IOException ex) {
         }
         return result;
-    }//findAllHostsInFile
+    }//findAll
 
     @Override
-    public Host findByHostId(String idOfHost) {
-        return findAllHostsInFile().stream()
-                .filter(i -> i.getId().equalsIgnoreCase(idOfHost))
+    public Host findByHostId(String id) {
+        return findAll().stream()
+                .filter(i -> i.getId().equalsIgnoreCase(id))
                 .findFirst()
                 .orElse(null);
     }//findByHostId
 
-    @Override
-    public Host findByHostEmail(String emailOfHost) {
-        return findAllHostsInFile().stream()
-                .filter(i -> i.getEmailOfHost().equalsIgnoreCase(emailOfHost))
-                .findFirst()
-                .orElse(null);
-    }//findByIdOfHost
+//    @Override
+//    public Host findByHostEmail(String emailOfHost) {
+//        return findAllHostsInFile().stream()
+//                .filter(i -> i.getEmailOfHost().equalsIgnoreCase(emailOfHost))
+//                .findFirst()
+//                .orElse(null);
+//    }//findByIdOfHost
 
-    public Map<String, BigDecimal> findStandardRateOfHostById(Integer idOfHost){
-        List<Host> host = findAllHostsInFile();
-        Map<String, BigDecimal> map = new HashMap<>();
-        for(Host h:host) {
-            map.put(h.getId(),
-                    h.getStandardRateOfHost());
-        }
-        return map;
-    }//findStandardRateOfHostById
+//    public Map<String, BigDecimal> findStandardRateOfHostById(Integer idOfHost){
+//        List<Host> host = findAllHostsInFile();
+//        Map<String, BigDecimal> map = new HashMap<>();
+//        for(Host h:host) {
+//            map.put(h.getId(),
+//                    h.getStandardRateOfHost());
+//        }
+//        return map;
+//    }//findStandardRateOfHostById
 
-    public Map<String, BigDecimal> findWeekendRateOfHostById(Integer idOfHost){
-        List<Host> host = findAllHostsInFile();
-        Map<String, BigDecimal> map = new HashMap<>();
-        for(Host h:host) {
-            map.put(h.getId(),
-                    h.getWeekendRateOfHost());
-        }
-        return map;
-    }//findWeekendRateOfHostById
-
-
+//    public Map<String, BigDecimal> findWeekendRateOfHostById(Integer idOfHost){
+//        List<Host> host = findAllHostsInFile();
+//        Map<String, BigDecimal> map = new HashMap<>();
+//        for(Host h:host) {
+//            map.put(h.getId(),
+//                    h.getWeekendRateOfHost());
+//        }
+//        return map;
+//    }//findWeekendRateOfHostById
 
     //HELPER METHODS//
     private Host deserialize(String[] fields) {
@@ -93,23 +91,6 @@ public class HostFileRepository implements HostRepository {
         result.setWeekendRateOfHost(new BigDecimal(fields[9]));
         return result;
     }//deserialize
-
-//    private String serialize(Host host) {
-//        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
-//                host.getId(),
-//                host.getLastNameOfHost(),
-//                host.getEmailOfHost(),
-//                host.getPhoneOfHost(),
-//                host.getAddressOfHost(),
-//                host.getCityOfHost(),
-//                host.getStateOfHost(),
-//                host.getPostalCodeOfHost(),
-//                host.getStandardRateOfHost(),
-//                host.getWeekendRateOfHost());
-//    }//serialize
-
-
-
 
 
 }//end

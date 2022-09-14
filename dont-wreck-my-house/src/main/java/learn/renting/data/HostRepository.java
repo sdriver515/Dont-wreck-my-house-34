@@ -6,12 +6,8 @@ import java.util.List;
 
 public interface HostRepository {
 
-    List<Host> findAllHostsInFile();//findAllHostsInFile
+    List<Host> findAll();
 
+    Host findByHostId(String id);
 
-    Host findByHostId(String idOfHost)//findByIdOfHost
-    ;
-
-    Host findByHostEmail(String emailOfHost)//findByIdOfHost
-    ;
 }//end

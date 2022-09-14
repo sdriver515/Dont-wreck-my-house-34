@@ -10,18 +10,32 @@ public class Host {
     private String phoneOfHost;
     private String addressOfHost;
     private String cityOfHost;
-
     private String stateOfHost;
     private int postalCodeOfHost;
     private BigDecimal standardRateOfHost;
     private BigDecimal weekendRateOfHost;
+
+    //CONSTRUCTORS
+    public Host(){}
+    public Host(String id, String lastNameOfHost, String emailOfHost, String phoneOfHost, String addressOfHost, String cityOfHost, String stateOfHost, int postalCodeOfHost, BigDecimal standardRateOfHost, BigDecimal weekendRateOfHost) {
+        this.id = id;
+        this.lastNameOfHost = lastNameOfHost;
+        this.emailOfHost = emailOfHost;
+        this.phoneOfHost = phoneOfHost;
+        this.addressOfHost = addressOfHost;
+        this.cityOfHost = cityOfHost;
+        this.stateOfHost = stateOfHost;
+        this.postalCodeOfHost = postalCodeOfHost;
+        this.standardRateOfHost = standardRateOfHost;
+        this.weekendRateOfHost = weekendRateOfHost;
+    }//Host
 
     //GETTERS AND SETTERS
 
     public String getId() {
         return id;
     }
-    public void setId(String idOfHost) {
+    public void setId(String id) {
         this.id = id;
     }
     public String getLastNameOfHost() {
@@ -80,26 +94,5 @@ public class Host {
         this.postalCodeOfHost = postalCodeOfHost;
     }
 
-    //CONSTRUCTORS
-    public Host(){}
-    public Host(String id, String lastNameOfHost, String emailOfHost, String phoneOfHost, String addressOfHost, String cityOfHost, String stateOfHost, int postalCodeOfHost, BigDecimal standardRateOfHost, BigDecimal weekendRateOfHost) {
-        this.id = id;
-        this.lastNameOfHost = lastNameOfHost;
-        this.emailOfHost = emailOfHost;
-        this.phoneOfHost = phoneOfHost;
-        this.addressOfHost = addressOfHost;
-        this.cityOfHost = cityOfHost;
-        this.stateOfHost = stateOfHost;
-        this.postalCodeOfHost = postalCodeOfHost;
-        this.standardRateOfHost = standardRateOfHost;
-        this.weekendRateOfHost = weekendRateOfHost;
-    }//Host
-
-    public Host(String id, String lastNameOfHost, BigDecimal standardRateOfHost, BigDecimal weekendRateOfHost){
-        this.id = id;
-        this.lastNameOfHost = lastNameOfHost;
-        this.standardRateOfHost = standardRateOfHost;
-        this.weekendRateOfHost = weekendRateOfHost;
-    }
 
 }//end
