@@ -18,23 +18,31 @@ public class ReservationRepositoryDouble implements ReservationRepository{
         Reservation reservation = new Reservation();
         reservation.setId(1);
         reservation.setStartDateOfStay(LocalDate.of(2022, 9,20));
-        reservation.setEndDateOfStay(LocalDate.of(2022, 9, 21));
+        reservation.setEndDateOfStay(LocalDate.of(2022, 9, 22));
         reservation.setGuest(GuestRepositoryDouble.GUEST);
         reservation.setTotalCost(BigDecimal.valueOf(200));
         reservation.setHost(HostRepositoryDouble.HOST);
         reservations.add(reservation);
+
+        Reservation reservationTwo = new Reservation();
+        reservationTwo.setStartDateOfStay(LocalDate.of(2023, 8,21));
+        reservationTwo.setEndDateOfStay(LocalDate.of(2023, 8, 25));
+        reservationTwo.setGuest(GuestRepositoryDouble.OTHERGUEST);
+        reservationTwo.setTotalCost(BigDecimal.valueOf(500));
+        reservationTwo.setHost(HostRepositoryDouble.OTHERHOST);
+        reservations.add(reservationTwo);
     }
 
     @Override
     public List<Reservation> findByHost(Host host) throws DataException {
         return reservations.stream()
-                .filter(i -> i.getHost().getId().equals(host))
+                .filter(i -> i.getHost().getId().equals(host.getId()))
                 .collect(Collectors.toList());
     }//findByHost
 
     @Override
     public Reservation add(Reservation reservation) throws DataException {
-        reservation.setId(2);
+        reservation.setId(3);//keep an eye on this
         reservations.add(reservation);
         return reservation;
     }//add

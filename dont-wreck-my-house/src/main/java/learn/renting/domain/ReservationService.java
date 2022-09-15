@@ -34,7 +34,7 @@ public class ReservationService {
 
     //CREATE
     public Result<Reservation> add(Reservation reservation) throws DataException {
-        validateNulls(reservation);
+        reservation.setTotalCost(returnCostOfStay(reservation));
         Result result = validateAdd(reservation);
         if (!result.isSuccess()) {
             return result;
@@ -46,7 +46,6 @@ public class ReservationService {
         if(!reservation.getTotalCost().equals(returnCostOfStay(reservation))){
             result.addErrorMessage("The cost is not correct.");
         }
-
         reservation = reservationRepository.add(reservation);
         result.setPayload(reservation);
 
@@ -54,19 +53,39 @@ public class ReservationService {
     }//add
 
     //update reservation
+    public Result<Reservation> update(Reservation reservation) throws DataException {
+        reservation.setTotalCost(returnCostOfStay(reservation));
+        Result result = validateUpdate(reservation);
+        boolean updated = reservationRepository.updateReservation(reservation);
+        return  result;
+    }//update
 
     //delete reservation
 
     //validate add to validate that the result is successful, and it gets the host
     private Result<Reservation> validateAdd(Reservation reservation) throws DataException {
-        Result<Reservation> result = new Result<>();
 
+        Result<Reservation> result = validateNulls(reservation);
+        if (!result.isSuccess()) {
+            return result;
+        }
+        result = validateDuplicates(reservation);
+        if (!result.isSuccess()) {
+            return result;
+        }
         if(trueIfWithinRange(reservation)){
             result.addErrorMessage("Your reservation would be within a time frame that is already occupied. That is not permitted in our business model.");
         }
         if(!trueIfInFuture(reservation)){
             result.addErrorMessage("This is not in the future. You cannot add reservations to the past.");
         }
+        if(trueIfEndDateIsBeforeStartDate(reservation)){
+            result.addErrorMessage("Your end date is before your start date.");
+        }
+        if(trueIfEqualsItself(reservation)){
+            result.addErrorMessage("You cannot book only a few hours in one day. Sorry.");
+        }
+
         return result;
     }//validateAdd
 
@@ -76,6 +95,9 @@ public class ReservationService {
 
         if(!trueIfInFuture(reservation)){
             result.addErrorMessage("You cannot update a reservation set in the past.");
+        }
+        if(trueIfEndDateIsBeforeStartDate(reservation)){
+            result.addErrorMessage("The end date cannot be before the start date.");
         }
         return result;
     }//validateUpdate
@@ -105,41 +127,52 @@ public class ReservationService {
     }//validateNulls
 
     //validate duplicates
-
-    //HELPER METHODS
+    private Result<Reservation> validateDuplicates(Reservation reservation) throws DataException {
+        Result<Reservation> result = new Result<>();
+        List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
+        for(Reservation i : all){
+            if (i.getStartDateOfStay().equals(reservation.getStartDateOfStay())){
+                result.addErrorMessage("That start date is already occupied.");
+            }
+            else if(i.getEndDateOfStay().equals(reservation.getEndDateOfStay())){
+                result.addErrorMessage("That end date is already occupied.");
+            }
+             if (i.getStartDateOfStay().equals(reservation.getStartDateOfStay())){
+                if(i.getEndDateOfStay().equals(reservation.getEndDateOfStay())){
+                    result.addErrorMessage("Actually, both the start and end dates of that are already occupied.");
+                }
+            }
+        }
+        return result;
+    }//validateDuplicates
 
     public BigDecimal returnCostOfStay(Reservation reservation){
-        int weekendCount = 0;
-        int weekdayCount = 0;
         BigDecimal standardRateOfHost = reservation.getHost().getStandardRateOfHost();
         BigDecimal weekendRateOfHost = reservation.getHost().getWeekendRateOfHost();
         BigDecimal result = BigDecimal.ONE;
-
-        if (reservation.getStartDateOfStay() == null || reservation.getEndDateOfStay() == null) {
-            throw new IllegalArgumentException("Problems here. Something is null.");
+        if(reservation.getStartDateOfStay().isBefore(reservation.getEndDateOfStay()) && (!reservation.getStartDateOfStay().equals(reservation.getStartDateOfStay()))) {
+            if (reservation.getStartDateOfStay() == null || reservation.getEndDateOfStay() == null) {
+                throw new IllegalArgumentException("Problems here. Something is null.");
+            }
+            Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
+                    || date.getDayOfWeek() == DayOfWeek.FRIDAY;
+            Predicate<LocalDate> isWeekday = date -> date.getDayOfWeek() == DayOfWeek.SUNDAY
+                    || date.getDayOfWeek() == DayOfWeek.MONDAY
+                    || date.getDayOfWeek() == DayOfWeek.TUESDAY
+                    || date.getDayOfWeek() == DayOfWeek.WEDNESDAY
+                    || date.getDayOfWeek() == DayOfWeek.THURSDAY;
+            List<LocalDate> weekdays = reservation.getStartDateOfStay().datesUntil(reservation.getEndDateOfStay())
+                    .filter(isWeekend.negate()).toList();
+            List<LocalDate> weekend = reservation.getStartDateOfStay().datesUntil(reservation.getEndDateOfStay())
+                    .filter(isWeekday.negate()).toList();
+            int weekdayCount = weekdays.size();
+            int weekendCount = weekend.size();
+            BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
+            BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
+            result = weekendCostResult.add(weekdayCostResult);
+            return result;
         }
-        Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
-                || date.getDayOfWeek() == DayOfWeek.FRIDAY;
-
-        Predicate<LocalDate> isWeekday = date -> date.getDayOfWeek() == DayOfWeek.SUNDAY
-                || date.getDayOfWeek() == DayOfWeek.MONDAY
-                || date.getDayOfWeek() == DayOfWeek.TUESDAY
-                || date.getDayOfWeek() == DayOfWeek.WEDNESDAY
-                || date.getDayOfWeek() == DayOfWeek.THURSDAY;
-
-        List<LocalDate> weekdays = reservation.getStartDateOfStay().datesUntil(reservation.getEndDateOfStay())
-                .filter(isWeekend.negate()).toList();
-
-        List<LocalDate> weekend = reservation.getStartDateOfStay().datesUntil(reservation.getEndDateOfStay())
-                .filter(isWeekday.negate()).toList();
-
-        weekdayCount=weekdays.size();
-        weekendCount=weekend.size();
-
-        BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
-        BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
-        result = weekendCostResult.add(weekdayCostResult);
-        return  result;
+        return result;
     }//returnCostOfStayAtHost
 
     public boolean trueIfIsWeekendRate(Reservation reservation) throws DataException {
@@ -161,6 +194,13 @@ public class ReservationService {
         return false;
     }//trueIfWithinRange
 
+    public boolean trueIfEqualsItself(Reservation reservation) throws DataException{
+        if(reservation.getStartDateOfStay().equals(reservation.getEndDateOfStay())){
+            return true;
+        }
+            return false;
+    }//trueIfEqualsItself
+
     public Map<LocalDate, LocalDate> returnOccupiedDatesOfHost(Reservation reservation) throws DataException {
         List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
         Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
@@ -179,7 +219,14 @@ public class ReservationService {
         return false;
     }//trueIfInFuture
 
-        public List<Reservation> findFutureReservations(Reservation reservation) throws DataException {
+    public boolean trueIfEndDateIsBeforeStartDate(Reservation reservation) throws DataException {
+        if(reservation.getEndDateOfStay().isBefore(reservation.getStartDateOfStay())){
+            return true;
+        }
+        return false;
+    }//trueIfEndDateIsBeforeStartDates
+
+    public List<Reservation> findFutureReservations(Reservation reservation) throws DataException {
         List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
         List<Reservation> result = new ArrayList<>();
         for(Reservation i : all) {
