@@ -17,8 +17,8 @@ public class ReservationRepositoryDouble implements ReservationRepository{
     public ReservationRepositoryDouble() {
         Reservation reservation = new Reservation();
         reservation.setId(1);
-        reservation.setStartDateOfStay(LocalDate.of(2002, 5,5));
-        reservation.setEndDateOfStay(LocalDate.of(2002, 5, 6));
+        reservation.setStartDateOfStay(LocalDate.of(2022, 9,20));
+        reservation.setEndDateOfStay(LocalDate.of(2022, 9, 21));
         reservation.setGuest(GuestRepositoryDouble.GUEST);
         reservation.setTotalCost(BigDecimal.valueOf(200));
         reservation.setHost(HostRepositoryDouble.HOST);

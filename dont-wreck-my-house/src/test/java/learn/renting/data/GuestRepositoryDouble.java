@@ -7,16 +7,14 @@ import java.util.List;
 
 public class GuestRepositoryDouble implements GuestRepository{
     public final static Guest GUEST = new Guest(123, "Mathias", "Spieker", ".", ".", ".");
-    private final ArrayList<Guest> guests = new ArrayList<>();
+    private final ArrayList<Guest> all = new ArrayList<>();
 
     public GuestRepositoryDouble() {
-        guests.add(GUEST);
+        all.add(GUEST);
     }
-
 
     @Override
     public List<Guest> findAll() {
-        ArrayList<Guest> all = new ArrayList<>();
         all.add(new Guest(444, "Sarah", "Driver", "sdriver@udel.edu", "410-808-5299", "MD"));
         return all;
     }//findAll
