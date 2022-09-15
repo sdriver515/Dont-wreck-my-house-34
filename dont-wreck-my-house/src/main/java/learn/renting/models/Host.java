@@ -11,13 +11,13 @@ public class Host {
     private String addressOfHost;
     private String cityOfHost;
     private String stateOfHost;
-    private int postalCodeOfHost;
+    private String postalCodeOfHost;//change issues
     private BigDecimal standardRateOfHost;
     private BigDecimal weekendRateOfHost;
 
     //CONSTRUCTORS
     public Host(){}
-    public Host(String id, String lastNameOfHost, String emailOfHost, String phoneOfHost, String addressOfHost, String cityOfHost, String stateOfHost, int postalCodeOfHost, BigDecimal standardRateOfHost, BigDecimal weekendRateOfHost) {
+    public Host(String id, String lastNameOfHost, String emailOfHost, String phoneOfHost, String addressOfHost, String cityOfHost, String stateOfHost, String postalCodeOfHost, BigDecimal standardRateOfHost, BigDecimal weekendRateOfHost) {
         this.id = id;
         this.lastNameOfHost = lastNameOfHost;
         this.emailOfHost = emailOfHost;
@@ -87,10 +87,10 @@ public class Host {
     public void setStateOfHost(String stateOfHost) {
         this.stateOfHost = stateOfHost;
     }
-    public int getPostalCodeOfHost() {
+    public String getPostalCodeOfHost() {
         return postalCodeOfHost;
     }
-    public void setPostalCodeOfHost(int postalCodeOfHost) {
+    public void setPostalCodeOfHost(String postalCodeOfHost) {
         this.postalCodeOfHost = postalCodeOfHost;
     }
 
