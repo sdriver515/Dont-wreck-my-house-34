@@ -160,29 +160,64 @@ public class ReservationServiceTest {
     //UPDATE
     @Test
     void shouldUpdate() throws DataException{
-        List<Reservation> all = service.findByHost(HostRepositoryDouble.HOST);
-        Reservation toUpdate = new Reservation();
-        toUpdate.setEndDateOfStay(LocalDate.of(2023,1,1));
-        toUpdate.setEndDateOfStay(LocalDate.of(2023,1,3));
-        toUpdate.setHost(HostRepositoryDouble.HOST);
-        toUpdate.setGuest(GuestRepositoryDouble.GUEST);
-        
+        Reservation reservation = new Reservation();
+        reservation.setHost(HostRepositoryDouble.HOST);
+        reservation.setGuest(GuestRepositoryDouble.GUEST);
+        reservation.setId(1);
+        reservation.setStartDateOfStay(LocalDate.of(2022, 10,10));
+        reservation.setEndDateOfStay(LocalDate.of(2022, 10,12));
 
+        Result<Reservation> result = service.update(reservation);
+        assertTrue(result.isSuccess());
     }//shouldUpdate
 
-    //DELETE
-//    @Test
-//    void shouldDelete() throws DataException{
-//        Guest guest = guestRepository.findById(123);
-//        Host host = hostRepository.findByHostId("7537");
-//        Reservation reservation = new Reservation();
-//        reservation.setId(1);
-//        reservation.setGuest(guest);
-//        reservation.setHost(host);
-//
-//        Result<Reservation> result = service.delete(reservation);
-//        assertTrue(result.isSuccess());
-//    }//shouldDelete
+    @Test
+    void shouldNotUpdateNonExistentReservation() throws DataException{
+        Reservation reservation = new Reservation();
+        reservation.setId(9999999);
+        reservation.setGuest(GuestRepositoryDouble.GUEST);
+        reservation.setHost(HostRepositoryDouble.HOST);
+        reservation.setStartDateOfStay(LocalDate.of(3000, 1,1));
+        reservation.setEndDateOfStay(LocalDate.of(3000, 1,2));
 
+        Result<Reservation> result = service.update(reservation);
+        assertTrue(result.getErrorMessages().get(0).contains("Reservation does not exist."));
+        assertFalse(result.isSuccess());
+    }//shouldUpdate
+
+//    DELETE
+    @Test
+    void shouldDelete() throws DataException{
+        List<Reservation> all = service.findByHost(HostRepositoryDouble.HOST);
+        Reservation reservation = all.get(0);
+        service.delete(reservation, all);
+        Result<Reservation> result = service.delete(reservation, all);
+        assertTrue(result.isSuccess());
+    }//shouldDelete
+
+    @Test
+    void shouldNotDeleteFromDatesInThePast() throws DataException{
+        List<Reservation> all = service.findByHost(HostRepositoryDouble.HOST);
+        Reservation reservation = all.get(0);
+        reservation.setStartDateOfStay(LocalDate.of(2011,1,1));
+        reservation.setEndDateOfStay(LocalDate.of(2011,1,3));
+        service.delete(reservation, all);
+        Result<Reservation> result = service.delete(reservation, all);
+        assertFalse(result.isSuccess());
+    }//shouldDelete
+
+    //HELPER METHODS
+    @Test
+    void shouldCalculateTotal() {
+        Reservation reservation = new Reservation();
+        reservation.setGuest(GuestRepositoryDouble.GUEST);
+        reservation.setHost(HostRepositoryDouble.HOST);
+        reservation.setStartDateOfStay(LocalDate.of(2022,8,12));
+        reservation.setEndDateOfStay(LocalDate.of(2022,8,13));
+
+        service.returnCostOfStay(reservation);
+        assertNotNull(reservation);
+        assertEquals(BigDecimal.valueOf(200), reservation.getTotalCost());
+    }//shouldCalculateTotal
 
 }//end

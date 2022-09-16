@@ -49,17 +49,18 @@ public class ReservationRepositoryDouble implements ReservationRepository{
 
     @Override
     public boolean updateReservation(Reservation reservation) throws DataException {
-        return reservation.getId() >= 0;
+//        return reservation.getId() >= 0;
+        return reservation.getId() != 9999999;
     }//updateReservation
 
-    @Override
-    public boolean updateReservationByGuest(Reservation reservation) throws DataException {//ADDED BY SARAH TO TEST SOMETHING
-        return reservation.getId() >= 0;
-    }//updateReservationByGuest
+//    @Override
+//    public boolean updateReservationByGuest(Reservation reservation) throws DataException {//ADDED BY SARAH TO TEST SOMETHING
+//        return reservation.getId() >= 0;
+//    }//updateReservationByGuest
 
     @Override
     public boolean deleteReservation(Reservation reservation) throws DataException {
-        return reservation.getId() != 999;
+        return reservation.getId() != 9999999;
     }//deleteReservation
 
 }//end

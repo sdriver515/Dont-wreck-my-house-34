@@ -181,18 +181,19 @@ public class ReservationFileRepository implements ReservationRepository{
         return false;
     }//update
 
-    @Override
-    public boolean updateReservationByGuest(Reservation reservation) throws DataException {
-        List<Reservation> all = findByHost(reservation.getHost());
-        for(int i = 0; i < all.size(); i++) {
-            if (all.get(i).getGuest() == reservation.getGuest()) {
-                all.set(i, reservation);
-                writeAll(all, reservation.getHost());
-                return true;
-            }
-        }
-        return false;
-    }//updateReservationByGuest
+//    @Override
+//    public boolean updateReservationByGuest(Reservation reservation) throws DataException {
+//        List<Reservation> all = findByHost(reservation.getHost());
+//        for(int i = 0; i < all.size(); i++) {
+//            if (all.get(i).getGuest() == reservation.getGuest()) {
+//                all.set(i, reservation);
+//                writeAll(all, reservation.getHost());
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }//updateReservationByGuest
 
     //DELETE
     @Override

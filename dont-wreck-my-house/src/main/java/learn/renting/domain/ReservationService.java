@@ -64,19 +64,20 @@ public class ReservationService {
         if(!reservationRepository.updateReservation(reservation)){
             result.addErrorMessage("Reservation does not exist.");
         }
+        reservationRepository.updateReservation(reservation);//added this
         return  result;
     }//update
 
-    public Result<Reservation> updateByGUEST(Reservation reservation) throws DataException {
-        Result<Reservation> result = validateUpdate(reservation);
-        if(!result.isSuccess()){
-            return result;
-        }
-        if(!reservationRepository.updateReservation(reservation)){
-            result.addErrorMessage("Reservation does not exist.");
-        }
-        return  result;
-    }//update
+//    public Result<Reservation> updateByGUEST(Reservation reservation) throws DataException {
+//        Result<Reservation> result = validateUpdate(reservation);
+//        if(!result.isSuccess()){
+//            return result;
+//        }
+//        if(!reservationRepository.updateReservationByGuest(reservation)){
+//            result.addErrorMessage("Reservation does not exist.");
+//        }
+//        return  result;
+//    }//updateByGUEST
 
     //delete reservation
     public Result<Reservation> delete(Reservation reservation, List<Reservation> reservations) throws DataException {
@@ -91,6 +92,7 @@ public class ReservationService {
             result.addErrorMessage("Reservation does not exist.");
             return result;
         }
+        reservationRepository.deleteReservation(reservation);//added this
         return result;
     }//delete
 
