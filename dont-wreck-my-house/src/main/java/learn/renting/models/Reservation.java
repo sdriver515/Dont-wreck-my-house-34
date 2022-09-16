@@ -24,6 +24,20 @@ public class Reservation {
         this.host = host;
     }
 
+    //CONSTRUCTORS
+    public Reservation(){};
+//    public Reservation(int id, LocalDate startDateOfStay, LocalDate endDateOfStay, Guest guest, BigDecimal totalCost) {
+//        this.id = id;
+//        this.startDateOfStay = startDateOfStay;
+//        this.endDateOfStay = endDateOfStay;
+//        this.guest = guest;
+//        this.totalCost = totalCost;
+//    }
+    public Reservation(LocalDate startDateOfStay, LocalDate endDateOfStay){
+        this.startDateOfStay = startDateOfStay;
+        this.endDateOfStay = endDateOfStay;
+    }
+
 //GETTERS AND SETTERS
 
     public Host getHost() {
@@ -72,16 +86,6 @@ public class Reservation {
     }
 
     public void setTotalCost(BigDecimal totalCost) {
-        this.totalCost = totalCost;
-    }
-
-    //CONSTRUCTORS
-    public Reservation(){};
-    public Reservation(int id, LocalDate startDateOfStay, LocalDate endDateOfStay, Guest guest, BigDecimal totalCost) {
-        this.id = id;
-        this.startDateOfStay = startDateOfStay;
-        this.endDateOfStay = endDateOfStay;
-        this.guest = guest;
         this.totalCost = totalCost;
     }
 

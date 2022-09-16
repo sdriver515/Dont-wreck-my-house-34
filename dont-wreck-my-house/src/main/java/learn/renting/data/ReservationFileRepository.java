@@ -8,11 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Repository
 public class ReservationFileRepository implements ReservationRepository{
@@ -183,6 +180,19 @@ public class ReservationFileRepository implements ReservationRepository{
             }
         return false;
     }//update
+
+    @Override
+    public boolean updateReservationByGuest(Reservation reservation) throws DataException {
+        List<Reservation> all = findByHost(reservation.getHost());
+        for(int i = 0; i < all.size(); i++) {
+            if (all.get(i).getGuest() == reservation.getGuest()) {
+                all.set(i, reservation);
+                writeAll(all, reservation.getHost());
+                return true;
+            }
+        }
+        return false;
+    }//updateReservationByGuest
 
     //DELETE
     @Override

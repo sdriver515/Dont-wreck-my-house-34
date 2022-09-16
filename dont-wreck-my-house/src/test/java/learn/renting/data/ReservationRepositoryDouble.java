@@ -36,7 +36,7 @@ public class ReservationRepositoryDouble implements ReservationRepository{
     @Override
     public List<Reservation> findByHost(Host host) throws DataException {
         return reservations.stream()
-                .filter(i -> i.getHost().getId().equals(host.getId()))
+                .filter(i -> i.getHost().equals(host))
                 .collect(Collectors.toList());
     }//findByHost
 
@@ -51,6 +51,11 @@ public class ReservationRepositoryDouble implements ReservationRepository{
     public boolean updateReservation(Reservation reservation) throws DataException {
         return reservation.getId() >= 0;
     }//updateReservation
+
+    @Override
+    public boolean updateReservationByGuest(Reservation reservation) throws DataException {//ADDED BY SARAH TO TEST SOMETHING
+        return reservation.getId() >= 0;
+    }//updateReservationByGuest
 
     @Override
     public boolean deleteReservation(Reservation reservation) throws DataException {

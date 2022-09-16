@@ -38,7 +38,6 @@ public class ReservationService {
         if (!result.isSuccess()) {
             return result;
         }
-//        reservation.setTotalCost(returnCostOfStay(reservation));
         result.setPayload(reservationRepository.add(reservation));
 
         return result;
@@ -58,6 +57,17 @@ public class ReservationService {
 
     //update reservation
     public Result<Reservation> update(Reservation reservation) throws DataException {
+        Result<Reservation> result = validateUpdate(reservation);
+        if(!result.isSuccess()){
+            return result;
+        }
+        if(!reservationRepository.updateReservation(reservation)){
+            result.addErrorMessage("Reservation does not exist.");
+        }
+        return  result;
+    }//update
+
+    public Result<Reservation> updateByGUEST(Reservation reservation) throws DataException {
         Result<Reservation> result = validateUpdate(reservation);
         if(!result.isSuccess()){
             return result;
@@ -149,7 +159,7 @@ public class ReservationService {
         return result;
     }//validateNulls
 
-    private void validateDuplicates(Result<Reservation> result, Reservation newReservation, List<Reservation> existingReservations) throws DataException {
+    public void validateDuplicates(Result<Reservation> result, Reservation newReservation, List<Reservation> existingReservations) throws DataException {
         for(Reservation existingReservation : existingReservations){
             if(newReservation.getStartDateOfStay().isBefore(existingReservation.getStartDateOfStay()) && newReservation.getEndDateOfStay().isAfter(existingReservation.getStartDateOfStay())) {
                 result.addErrorMessage("Reservations cannot overlap.");
@@ -170,6 +180,9 @@ public class ReservationService {
         if(newReservation.getStartDateOfStay().isAfter(newReservation.getEndDateOfStay())){
             result.addErrorMessage("Start date must be before end date.");
         }
+        if(newReservation.getStartDateOfStay().isEqual(newReservation.getEndDateOfStay())){//I added
+            result.addErrorMessage("Start and end date cnanot be the same.");
+        }
     }//validateDuplicates
 
     public void returnCostOfStay(Reservation reservation){
@@ -182,47 +195,12 @@ public class ReservationService {
             day = day.plusDays(1);
         }while(day.isBefore(reservation.getEndDateOfStay()));
         reservation.setTotalCost(totalCost);
-//        BigDecimal standardRateOfHost = reservation.getHost().getStandardRateOfHost();
-//        BigDecimal weekendRateOfHost = reservation.getHost().getWeekendRateOfHost();
-//        BigDecimal result = BigDecimal.ONE;
-//        if(reservation.getStartDateOfStay().isBefore(reservation.getEndDateOfStay()) && (!reservation.getStartDateOfStay().equals(reservation.getStartDateOfStay()))) {
-//            if (reservation.getStartDateOfStay() == null || reservation.getEndDateOfStay() == null) {
-//                throw new IllegalArgumentException("Problems here. Something is null.");
-//            }
-//            Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
-//                    || date.getDayOfWeek() == DayOfWeek.FRIDAY;
-//            Predicate<LocalDate> isWeekday = date -> date.getDayOfWeek() == DayOfWeek.SUNDAY
-//                    || date.getDayOfWeek() == DayOfWeek.MONDAY
-//                    || date.getDayOfWeek() == DayOfWeek.TUESDAY
-//                    || date.getDayOfWeek() == DayOfWeek.WEDNESDAY
-//                    || date.getDayOfWeek() == DayOfWeek.THURSDAY;
-//            List<LocalDate> weekdays = reservation.getStartDateOfStay().datesUntil(reservation.getEndDateOfStay())
-//                    .filter(isWeekend.negate()).toList();
-//            List<LocalDate> weekend = reservation.getStartDateOfStay().datesUntil(reservation.getEndDateOfStay())
-//                    .filter(isWeekday.negate()).toList();
-//            int weekdayCount = weekdays.size();
-//            int weekendCount = weekend.size();
-//            BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
-//            BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
-//            result = weekendCostResult.add(weekdayCostResult);
-//            reservation.setTotalCost(result);
-//        }
-//        reservation.setTotalCost(result);
     }//returnCostOfStayAtHost
 
     private boolean trueIfIsWeekendRate(LocalDate dayOfWeek) {
        DayOfWeek day = DayOfWeek.of(dayOfWeek.get(ChronoField.DAY_OF_WEEK));
        return day == DayOfWeek.FRIDAY || day == DayOfWeek.SATURDAY;
     }//trueIfIsWeekendRate
-
-    private boolean trueIfWithinRange(Reservation reservation) throws DataException {
-        List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
-        for( Reservation i : all){
-            if (reservation.getStartDateOfStay().isAfter(i.getStartDateOfStay()) && reservation.getEndDateOfStay().isBefore(i.getEndDateOfStay())){
-                return true;
-            }}
-        return false;
-    }//trueIfWithinRange
 
     private boolean trueIfEqualsItself(Reservation reservation) throws DataException{
         if(reservation.getStartDateOfStay().equals(reservation.getEndDateOfStay())){
@@ -232,14 +210,14 @@ public class ReservationService {
     }//trueIfEqualsItself
 
     private boolean trueIfHostDoesNotExist(Reservation reservation) throws DataException{
-        if(reservation.getHost().equals(hostRepository.findByHostId(reservation.getHost().getId()))){
+        if(!reservation.getHost().equals(hostRepository.findByHostId(reservation.getHost().getId()))){
             return true;
         }
         return false;
     }//trueIfHostDoesNotExist
 
     private boolean trueIfGuestDoesNotExist(Reservation reservation) throws DataException{
-        if(reservation.getGuest().equals(guestRepository.findById(reservation.getGuest().getId()))){
+        if(!reservation.getGuest().equals(guestRepository.findById(reservation.getGuest().getId()))){
             return true;
         }
         return false;
@@ -260,27 +238,14 @@ public class ReservationService {
         return false;
     }//trueIfEndDateIsBeforeStartDates
 
-    public Map<LocalDate, LocalDate> displayOccupiedDatesOfHost(Reservation reservation) throws DataException {
-        List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
-        Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
-        for(Reservation r : all){
-            mapWithTimes.put(r.getStartDateOfStay(),
-                    r.getEndDateOfStay());
-        }
-        return mapWithTimes;
-    }//displayOccupiedDatesOfHost
-
-    public List<Reservation> displayFutureReservations(Reservation reservation) throws DataException {
-        List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
-        List<Reservation> result = new ArrayList<>();
-        for(Reservation i : all) {
-            if (trueIfInFuture(reservation)) {
-                result.add(reservation);
-                //removed a writeAll line--would need a helper method
-                return result;
-            }
-        }
-        return null;
-    }//displayFutureReservations
+//    public Map<LocalDate, LocalDate> displayOccupiedDatesOfHost(Reservation reservation) throws DataException {
+//        List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
+//        Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
+//        for(Reservation r : all){
+//            mapWithTimes.put(r.getStartDateOfStay(),
+//                    r.getEndDateOfStay());
+//        }
+//        return mapWithTimes;
+//    }//displayOccupiedDatesOfHost
 
 }//end
