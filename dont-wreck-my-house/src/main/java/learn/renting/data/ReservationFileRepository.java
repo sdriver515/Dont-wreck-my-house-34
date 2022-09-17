@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -282,18 +283,5 @@ public class ReservationFileRepository implements ReservationRepository{
         }
         return maxId+1;
     }//getNextId
-
-//    @Override
-//    public boolean trueIfMatchingParameters(String hostId, int guestId, LocalDate startDate, LocalDate endDate) throws DataException {
-//        List<Reservation> all = findContentsOfReservationFileByHostId(hostId);
-//        for(Reservation reservation : all){
-//            if(reservation.getStartDateOfStay().equals(startDate))
-//                if(reservation.getEndDateOfStay().equals(endDate))
-//                    if(reservation.getGuest().getId() == guestId){
-//                        return true;
-//                    }
-//        }
-//        return false;
-//    }//trueIfMatchingParameters
 
 }//end

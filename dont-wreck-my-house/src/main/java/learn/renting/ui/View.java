@@ -53,31 +53,6 @@ public class View {
         return io.readString("Select a Guest Email: ");
     }//getGuestEmail
 
-    public Host chooseHost(List<Host> hosts) {
-        if (hosts.size() == 0) {
-            io.println("No hosts found");
-            return null;
-        }//chooseHost
-
-        int index = 1;
-        for (Host host : hosts.stream().limit(25).collect(Collectors.toList())) {
-            io.printf("%s: %s %n", index++, host.getLastNameOfHost());
-        }
-        index--;
-
-        if (hosts.size() > 25) {
-            io.println("More than 25 hosts found. Showing first 25. Please refine your search.");
-        }
-        io.println("0: Exit");
-        String message = String.format("Select a host by their index [0-%s]: ", index);
-
-        index = io.readInt(message, 0, index);
-        if (index <= 0) {
-            return null;
-        }
-        return hosts.get(index - 1);
-    }//chooseHost
-
     public Guest chooseGuest(List<Guest> guests) {
 
         displayGuests(guests);
@@ -97,68 +72,64 @@ public class View {
         }
 
         return guest;
-    }
+    }//chooseGuest
 
-    public Forage makeForage(Forager forager, Item item) {
-        Forage forage = new Forage();
-        forage.setForager(forager);
-        forage.setItem(item);
-        forage.setDate(io.readLocalDate("Forage date [MM/dd/yyyy]: "));
-        String message = String.format("Kilograms of %s: ", item.getName());
-        forage.setKilograms(io.readDouble(message, 0.001, 250.0));
-        return forage;
-    }//makeForage
+    public Host chooseHost(List<Host> hosts) {
 
-    public Item makeItem() {
-        displayHeader(MainMenuOption.ADD_ITEM.getMessage());
-        Item item = new Item();
-        item.setCategory(getItemCategory());
-        item.setName(io.readRequiredString("Item Name: "));
-        item.setDollarPerKilogram(io.readBigDecimal("$/Kg: ", BigDecimal.ZERO, new BigDecimal("7500.00")));
-        return item;
-    }//makeItem
+        displayHosts(hosts);
 
-    public Forager makeForager() {
-        displayHeader(MainMenuOption.ADD_FORAGER.getMessage());
-        Forager forager = new Forager();
-        forager.setFirstName(io.readRequiredString("Forager's first name: "));
-        forager.setLastName(io.readRequiredString("Forager's last name: "));
-        forager.setState(io.readRequiredString("Forager's state: "));
-        return forager;
-    }//makeForager
-
-    public void showCategoryValues(){//I added
-        displayHeader(MainMenuOption.REPORT_CATEGORY_VALUE.getMessage());
-    }//showCategoryValues
-
-    public void showKilogramPerDay(){//I added
-        displayHeader(MainMenuOption.REPORT_KG_PER_ITEM.getMessage());
-    }//showCategoryValues
-
-    public GenerateRequest getGenerateRequest() {
-        displayHeader(MainMenuOption.GENERATE.getMessage());
-        LocalDate start = io.readLocalDate("Select a start date [MM/dd/yyyy]: ");
-        if (start.isAfter(LocalDate.now())) {
-            displayStatus(false, "Start date must be in the past.");
+        if (hosts.size() == 0) {
             return null;
         }
 
-        LocalDate end = io.readLocalDate("Select an end date [MM/dd/yyyy]: ");
-        if (end.isAfter(LocalDate.now()) || end.isBefore(start)) {
-            displayStatus(false, "End date must be in the past and after the start date.");
-            return null;
+        String hostId = io.readString("Select a host ID: ");
+        Host host = hosts.stream()
+                .filter(i -> i.getId() == hostId)
+                .findFirst()
+                .orElse(null);
+
+        if (host == null) {
+            displayStatus(false, String.format("No host with ID %s found.", hostId));
         }
 
-        GenerateRequest request = new GenerateRequest();
-        request.setStart(start);
-        request.setEnd(end);
-        request.setCount(io.readInt("Generate how many random forages [1-500]?: ", 1, 500));
-        return request;
-    }
+        return host;
+    }//chooseHost
+
+//    public String getGuestEmailPrefix() {
+//        return io.readRequiredString("Guest email starts with: ");
+//    }//getGuestEmailPrefix
+
+    public Reservation makeReservation(Guest guest, Host host) {
+        Reservation reservation = new Reservation();
+        reservation.setHost(host);
+        reservation.setId(reservation.getId());
+        reservation.setStartDateOfStay(io.readLocalDate("Start date [MM/dd/yyyy]: "));
+        reservation.setEndDateOfStay(io.readLocalDate("End date [MM/dd/yyyy]: "));
+        reservation.setGuest(guest);
+        return reservation;
+    }//makeReservation
+
+    public Reservation updateReservation(Guest guest, Host host){
+        Reservation update = new Reservation();
+        update.setGuest(guest);
+        update.setHost(host);
+        update.setStartDateOfStay(io.readLocalDate("Start date [MM/dd/yyyy]: "));
+        update.setEndDateOfStay(io.readLocalDate("End date [MM/dd/yyyy]: "));
+        return update;
+    }//updateReservation
+
+    public void showReservationsByHost(){
+        displayHeader(MainMenuOption.VIEW_RESERVATIONS_BY_HOST.getMessage());
+    }//showReservationsByHost
+
+    public void makeReservation(){
+        displayHeader(MainMenuOption.MAKE_A_RESERVATION.getMessage());
+    }//makeReservation
+
 
     public void enterToContinue() {
         io.readString("Press [Enter] to continue.");
-    }
+    }//enterToContinue
 
     // display only
     public void displayHeader(String message) {

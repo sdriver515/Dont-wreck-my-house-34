@@ -34,6 +34,7 @@ public class ReservationService {
 
     //CREATE
     public Result<Reservation> add(Reservation reservation) throws DataException {
+        returnCostOfStay(reservation);//I JUST ADDED
         Result<Reservation> result = validateAdd(reservation);
         if (!result.isSuccess()) {
             return result;
@@ -58,6 +59,7 @@ public class ReservationService {
     //update reservation
     public Result<Reservation> update(Reservation reservation) throws DataException {
         Result<Reservation> result = validateUpdate(reservation);
+        returnCostOfStay(reservation);//I JUST ADDED
         if(!result.isSuccess()){
             return result;
         }
@@ -198,6 +200,7 @@ public class ReservationService {
         }while(day.isBefore(reservation.getEndDateOfStay()));
         reservation.setTotalCost(totalCost);
     }//returnCostOfStayAtHost
+
 
     private boolean trueIfIsWeekendRate(LocalDate dayOfWeek) {
        DayOfWeek day = DayOfWeek.of(dayOfWeek.get(ChronoField.DAY_OF_WEEK));

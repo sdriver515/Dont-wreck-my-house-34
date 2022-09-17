@@ -4,7 +4,14 @@ import learn.renting.data.DataException;
 import learn.renting.domain.GuestService;
 import learn.renting.domain.HostService;
 import learn.renting.domain.ReservationService;
+import learn.renting.domain.Result;
+import learn.renting.models.Guest;
+import learn.renting.models.Host;
+import learn.renting.models.Reservation;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class Controller {
@@ -21,134 +28,95 @@ public class Controller {
     }//Controller
 
 
-//    public void run() {
-//        view.displayHeader("Welcome to Don't Wreck My House!");
-//        try {
-//            runAppLoop();
-//        } catch (DataException ex) {
-//            view.displayException(ex);
-//        }
-//        view.displayHeader("Goodbye.");
-//    }
+    public void run() {
+        view.displayHeader("Welcome to Don't Wreck My House!");
+        try {
+            runAppLoop();
+        } catch (DataException ex) {
+            view.displayException(ex);
+        }
+        view.displayHeader("Goodbye.");
+    }
 
-//    private void runAppLoop() throws DataException {
-//        MainMenuOption option;
-//        do {
-//            option = view.selectMainMenuOption();
-//            switch (option) {
-//                case VIEW_RESERVATIONS_BY_HOST:
-//                    break;
-//                case MAKE_A_RESERVATION:
-//                    break;
-//                case EDIT_A_RESERVATION:
-//                    break;
-//                case CANCEL_A_RESERVATION:
-//                    break;
-//            }
-//        } while (option != MainMenuOption.EXIT);
-//    }
+    private void runAppLoop() throws DataException {
+        MainMenuOption option;
+        do {
+            option = view.selectMainMenuOption();
+            switch (option) {
+                case VIEW_RESERVATIONS_BY_HOST:
+                    viewByHost();
+                    break;
+                case MAKE_A_RESERVATION:
+                    addReservation();
+                    break;
+                case EDIT_A_RESERVATION:
+                    updateReservation();
+                    break;
+                case CANCEL_A_RESERVATION:
+                    break;
+            }
+        } while (option != MainMenuOption.EXIT);
+    }
 
-    // top level menu
-//    private void viewByDate() {
-//        LocalDate date = view.getForageDate();
-//        List<Forage> forages = forageService.findByDateTwo(date);
-//        view.displayForages(forages);
-//        view.enterToContinue();
-//    }//viewByDate
-//
-//    private void showCategoryValues(){
-//        view.showCategoryValues();
-//        LocalDate date = view.getForageDate();
-//        Map<Integer, BigDecimal> forages = forageService.findByCategoryValues(date);
-//        view.displayMapOfCategories(forages);
-//        view.enterToContinue();
-//    }//showCategoryValues
-//
-//    private void showItemKilogramPerDayValues(){
-//        view.showKilogramPerDay();
-//        LocalDate date = view.getForageDate();
-//        Map<Integer, BigDecimal> forages = forageService.findKilogramsOfItemsPerDay(date);
-//        view.displayMapOfItems(forages);
-//        view.enterToContinue();
-//    }//showCategoryValues
-//
-//    private void viewByState() {//added by me
-//        String state = view.getForagerState();
-//        List<Forager> foragers = foragerService.findByState(state);
-//        view.displayForagers(foragers);
-//        view.enterToContinue();
-//    }//viewByState
-//
-//    private void viewItems() {
-//        view.displayHeader(MainMenuOption.VIEW_ITEMS.getMessage());
-//        Category category = view.getItemCategory();
-//        List<Item> items = itemService.findByCategory(category);
-//        view.displayHeader("Items");
-//        view.displayItems(items);
-//        view.enterToContinue();
-//    }//viewItems
-//
-//    private void addForage() throws DataException {
-//        view.displayHeader(MainMenuOption.ADD_FORAGE.getMessage());
-//        Forager forager = getForager();
-//        if (forager == null) {
-//            return;
-//        }
-//        Item item = getItem();
-//        if (item == null) {
-//            return;
-//        }
-//        Forage forage = view.makeForage(forager, item);
-//        Result<Forage> result = forageService.add(forage);
-//        if (!result.isSuccess()) {
-//            view.displayStatus(false, result.getErrorMessages());
-//        } else {
-//            String successMessage = String.format("Forage %s created.", result.getPayload().getId());
-//            view.displayStatus(true, successMessage);
-//        }
-//    }//addForage
-//
-//    private void addItem() throws DataException {
-//        Item item = view.makeItem();
-//        Result<Item> result = itemService.add(item);
-//        if (!result.isSuccess()) {
-//            view.displayStatus(false, result.getErrorMessages());
-//        } else {
-//            String successMessage = String.format("Item %s created.", result.getPayload().getId());
-//            view.displayStatus(true, successMessage);
-//        }
-//    }//addItem
-//
-//    private void addForager() throws DataException {//I added
-//        Forager forager = view.makeForager();
-//        Result<Forager> result = foragerService.add(forager);
-//        if (!result.isSuccess()) {
-//            view.displayStatus(false, result.getErrorMessages());
-//        } else {
-//            String successMessage = String.format("Item %s created.", result.getPayload().getId());
-//            view.displayStatus(true, successMessage);
-//        }
-//    }//addForager
-//
-//    private void generate() throws DataException {
-//        GenerateRequest request = view.getGenerateRequest();
-//        if (request != null) {
-//            int count = forageService.generate(request.getStart(), request.getEnd(), request.getCount());
-//            view.displayStatus(true, String.format("%s forages generated.", count));
-//        }
-//    }//generate
-//
-//    // support methods
-//    private Forager getForager() {
-//        String lastNamePrefix = view.getForagerNamePrefix();
-//        List<Forager> foragers = foragerService.findByLastName(lastNamePrefix);
-//        return view.chooseForager(foragers);
-//    }//getForager
-//
-//    private Item getItem() {
-//        Category category = view.getItemCategory();
-//        List<Item> items = itemService.findByCategory(category);
-//        return view.chooseItem(items);
-//    }//getItem
+//     top level menu
+    private void viewByHost() throws DataException {
+        Host host = getHost();
+        List<Reservation> reservations = reservationService.findByHost(host);
+        view.displayReservations(reservations);
+        view.enterToContinue();
+    }//viewByHost
+
+    public void addReservation() throws DataException {
+        view.displayHeader(MainMenuOption.MAKE_A_RESERVATION.getMessage());
+        Host host = getHost();
+        if(host == null){
+            return;
+        }
+        Guest guest = getGuest();
+        if(guest == null){
+            return;
+        }
+        Reservation reservation = view.makeReservation(guest, host);
+        Result<Reservation> result = reservationService.add(reservation);
+        if(!result.isSuccess()){//added a "not"
+            view.displayStatus(false, result.getErrorMessages());
+        } else {
+            String successMessage = String.format("Reservation %s added.", reservation.getId());//changed this from the get payload thing
+            view.displayStatus(true, successMessage);
+        }
+    }//addReservation
+
+    public void updateReservation() throws DataException{
+        view.displayHeader(MainMenuOption.EDIT_A_RESERVATION.getMessage());
+        Host host = getHost();
+        Guest guest = getGuest();
+        if(host == null){
+            return;
+        }
+        if(guest == null){
+            return;
+        }
+        Reservation reservation = view.updateReservation(guest, host);
+        Result<Reservation> result = reservationService.update(reservation);
+        if(!result.isSuccess()){//added a "not"
+            view.displayStatus(false, result.getErrorMessages());
+        } else {
+            String successMessage = String.format("Your reservation for %s guest with %s host is updated.", reservation.getGuest().getLastNameOfGuest(), reservation.getHost().getId());
+            view.displayStatus(true, successMessage);
+        }
+    }//updateReservation
+
+    // support methods
+    private Guest getGuest() {
+        String guestEmail = view.getGuestEmail();
+        Guest guest = guestService.findByEmail(guestEmail);
+        return guest;
+    }//getGuest
+
+    private Host getHost() {
+        String hostEmail = view.getHostEmail();
+        Host host = hostService.findByEmail(hostEmail);
+        return host;
+    }//getHost
 
 }//end

@@ -16,7 +16,6 @@ public class GuestService {
     }
 
     public Guest findByEmail(String email){
-//        validateNulls(email);
         List<Guest> all = repository.findAll();
         for (Guest i : all){
             if(i.getEmailOfGuest().equals(email)){
@@ -26,16 +25,4 @@ public class GuestService {
         return null;
     }//findByEmail
 
-//    private Result<Guest> validateNulls(String email) {
-//        Result<Guest> result = new Result<>();
-//        if (email == null) {
-//            result.addErrorMessage("The email is null.");
-//            return result;
-//        }
-//        if(email.equals(" ")){
-//            result.addErrorMessage("Nothing is there.");
-//            return result;
-//        }
-//        return result;
-//    }//validateNulls
 }//end

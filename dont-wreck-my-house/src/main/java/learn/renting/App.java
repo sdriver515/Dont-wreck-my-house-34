@@ -18,7 +18,7 @@ public class App {
     private static void configureWithAnnotationsAndRun(){
         ApplicationContext container = new AnnotationConfigApplicationContext(App.class);
         Controller controller = container.getBean(Controller.class);
-//        controller.run();
+        controller.run();
     }//configureWithAnnotationsAndRun
 
 }//end
