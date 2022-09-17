@@ -96,7 +96,8 @@ public class Controller {
             return;
         }
         List<Reservation> reservations = reservationService.findByHost(host);
-        view.displayReservations(reservations);
+
+        view.displayFutureReservations(reservations);
 
         yesOrNoForGuests();
         Guest guest = getGuest();
