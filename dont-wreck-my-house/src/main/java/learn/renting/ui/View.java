@@ -44,12 +44,10 @@ public class View {
     }//viewReservationsByHost
 
     public String getHostEmail() {//
-        displayHeader(MainMenuOption.MAKE_A_RESERVATION.getMessage());
         return io.readString("Select a Host Email: ");
     }//getHostEmail
 
     public String getGuestEmail() {//
-        displayHeader(MainMenuOption.MAKE_A_RESERVATION.getMessage());
         return io.readString("Select a Guest Email: ");
     }//getGuestEmail
 
@@ -109,14 +107,23 @@ public class View {
         return reservation;
     }//makeReservation
 
-    public Reservation updateReservation(Guest guest, Host host){
+    public Reservation putTogetherReservationForUpdating(Guest guest, Host host){
         Reservation update = new Reservation();
         update.setGuest(guest);
         update.setHost(host);
+        update.setId(io.readInt("Choose a reservation ID to update: "));
         update.setStartDateOfStay(io.readLocalDate("Start date [MM/dd/yyyy]: "));
         update.setEndDateOfStay(io.readLocalDate("End date [MM/dd/yyyy]: "));
         return update;
-    }//updateReservation
+    }//putTogetherReservationForUpdating
+
+    public Reservation putTogetherReservationForDeletion(Guest guest, Host host){
+        Reservation toDelete = new Reservation();
+        toDelete.setGuest(guest);
+        toDelete.setHost(host);
+        toDelete.setId(io.readInt("Choose a reservation ID to delete: "));
+        return toDelete;
+    }//putTogetherReservationForDeletion
 
     public void showReservationsByHost(){
         displayHeader(MainMenuOption.VIEW_RESERVATIONS_BY_HOST.getMessage());

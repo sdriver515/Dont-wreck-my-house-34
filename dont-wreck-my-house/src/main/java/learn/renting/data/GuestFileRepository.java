@@ -44,15 +44,6 @@ public class GuestFileRepository implements GuestRepository {
                 .orElse(null);
     }//findById
 
-//    @Override
-//    public Guest findByGuestEmail(String emailOfGuest) {
-//        return findAllGuestsInFile().stream()
-//                .filter(i -> i.getEmailOfGuest().equalsIgnoreCase(emailOfGuest))
-//                .findFirst()
-//                .orElse(null);
-//    }//findById
-
-
     //HELPER METHODS//
     private Guest deserialize(String[] fields) {
         Guest result = new Guest();
@@ -65,14 +56,5 @@ public class GuestFileRepository implements GuestRepository {
         return result;
     }//deserialize
 
-//    private String serialize(Guest guest) {
-//        return String.format("%s,%s,%s,%s,%s,%s",
-//                guest.getId(),
-//                guest.getFirstNameOfGuest(),
-//                guest.getLastNameOfGuest(),
-//                guest.getEmailOfGuest(),
-//                guest.getPhoneOfGuest(),
-//                guest.getStateOfGuest());
-//    }//serialize
 
 }//end

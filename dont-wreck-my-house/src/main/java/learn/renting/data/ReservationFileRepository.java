@@ -114,59 +114,6 @@ public class ReservationFileRepository implements ReservationRepository{
 //            return result;
 //    }//returnFutureReservations
 
-//    @Override
-//    public boolean trueIfWithinRange(LocalDate startDate, LocalDate endDate, LocalDate inputDate){
-//            if (inputDate.isAfter(startDate) && inputDate.isBefore(endDate)){
-//                return true;
-//            }
-//        return false;
-//    }//trueIfWithinRange
-
-//    @Override
-//    public boolean trueIfInFuture(LocalDate startDate){
-//        LocalDate dateNow = LocalDate.now();
-//        if (startDate.isAfter(dateNow)){
-//            return true;
-//        }
-//        return false;
-//    }//trueIfInFuture
-
-//    @Override
-//    public BigDecimal returnCostOfStayAtHost(Host host, LocalDate startDate, LocalDate endDate){
-//        int weekendCount = 0;
-//        int weekdayCount = 0;
-//        BigDecimal standardRateOfHost = host.getStandardRateOfHost();
-//        BigDecimal weekendRateOfHost = host.getWeekendRateOfHost();
-//        BigDecimal result = BigDecimal.ONE;
-//
-//        if (startDate == null || endDate == null) {
-//            throw new IllegalArgumentException("Problems here. Something is null.");
-//        }
-//        Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
-//                || date.getDayOfWeek() == DayOfWeek.FRIDAY;
-//
-//        Predicate<LocalDate> isWeekday = date -> date.getDayOfWeek() == DayOfWeek.SUNDAY
-//                || date.getDayOfWeek() == DayOfWeek.MONDAY
-//                || date.getDayOfWeek() == DayOfWeek.TUESDAY
-//                || date.getDayOfWeek() == DayOfWeek.WEDNESDAY
-//                || date.getDayOfWeek() == DayOfWeek.THURSDAY;
-//
-//        List<LocalDate> weekdays = startDate.datesUntil(endDate)
-//                .filter(isWeekend.negate())
-//                .collect(Collectors.toList());
-//
-//        List<LocalDate> weekend = startDate.datesUntil(endDate)
-//                .filter(isWeekday.negate())
-//                .collect(Collectors.toList());
-//
-//        weekdayCount=weekdays.size();
-//        weekendCount=weekend.size();
-//
-//        BigDecimal weekdayCostResult = standardRateOfHost.multiply(BigDecimal.valueOf(weekdayCount));
-//        BigDecimal weekendCostResult = weekendRateOfHost.multiply(BigDecimal.valueOf(weekendCount));
-//        result = weekendCostResult.add(weekdayCostResult);
-//        return  result;
-//    }//returnCostOfStayAtHost
 
     //UPDATE
     @Override
@@ -181,20 +128,6 @@ public class ReservationFileRepository implements ReservationRepository{
             }
         return false;
     }//update
-
-//    @Override
-//    public boolean updateReservationByGuest(Reservation reservation) throws DataException {
-//        List<Reservation> all = findByHost(reservation.getHost());
-//        for(int i = 0; i < all.size(); i++) {
-//            if (all.get(i).getGuest() == reservation.getGuest()) {
-//                all.set(i, reservation);
-//                writeAll(all, reservation.getHost());
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }//updateReservationByGuest
 
     //DELETE
     @Override
@@ -230,20 +163,6 @@ public class ReservationFileRepository implements ReservationRepository{
                 reservation.getGuest().getId(),
                 reservation.getTotalCost());
     }//serialize
-
-//    private Reservation deserializeReservationFile(String[] fields) {
-//        Reservation result = new Reservation();
-//        result.setId(Integer.parseInt(fields[0]));
-//        result.setStartDateOfStay(LocalDate.parse((fields[1])));
-//        result.setEndDateOfStay(LocalDate.parse((fields[2])));
-//        result.setTotalCost(new BigDecimal((fields[4])));
-//
-//        Guest guest = new Guest();
-//        guest.setId(Integer.parseInt(fields[3]));
-//        result.setGuest(guest);
-//
-//        return result;
-//    }//deserializeForageFile
 
     private Reservation deserialize(String[] fields, Host host) {
         Reservation result = new Reservation();

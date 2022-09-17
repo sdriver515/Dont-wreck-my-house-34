@@ -53,6 +53,7 @@ public class Controller {
                     updateReservation();
                     break;
                 case CANCEL_A_RESERVATION:
+                    deleteReservation();
                     break;
             }
         } while (option != MainMenuOption.EXIT);
@@ -96,15 +97,36 @@ public class Controller {
         if(guest == null){
             return;
         }
-        Reservation reservation = view.updateReservation(guest, host);
+        Reservation reservation = view.putTogetherReservationForUpdating(guest, host);
         Result<Reservation> result = reservationService.update(reservation);
-        if(!result.isSuccess()){//added a "not"
+        if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
             String successMessage = String.format("Your reservation for %s guest with %s host is updated.", reservation.getGuest().getLastNameOfGuest(), reservation.getHost().getId());
             view.displayStatus(true, successMessage);
         }
     }//updateReservation
+
+    public void deleteReservation() throws DataException{
+        view.displayHeader(MainMenuOption.CANCEL_A_RESERVATION.getMessage());
+        Host host = getHost();
+        Guest guest = getGuest();
+        if(host == null){
+            return;
+        }
+        if(guest == null){
+            return;
+        }
+        Reservation reservation = view.putTogetherReservationForDeletion(guest, host);
+        List<Reservation> reservations = reservationService.findByHost(host);
+        Result<Reservation> result = reservationService.delete(reservation, reservations);
+        if(!result.isSuccess()){
+            view.displayStatus(false, result.getErrorMessages());
+        } else {
+            String successMessage = String.format("Your reservation for %s guest with %s host is deleted.", reservation.getGuest().getLastNameOfGuest(), reservation.getHost().getId());
+            view.displayStatus(true, successMessage);
+        }
+    }//deleteReservation
 
     // support methods
     private Guest getGuest() {

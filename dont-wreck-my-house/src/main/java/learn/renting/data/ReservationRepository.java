@@ -13,9 +13,6 @@ public interface ReservationRepository {
     Reservation add(Reservation reservation)throws DataException;
     boolean updateReservation(Reservation reservation) throws DataException;
 
-//    boolean updateReservationByGuest(Reservation reservation) throws DataException//updateReservationByGuest
-//    ;
-
     boolean deleteReservation(Reservation reservation) throws DataException;
 
 }//end

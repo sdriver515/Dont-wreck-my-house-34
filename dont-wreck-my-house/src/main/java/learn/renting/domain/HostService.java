@@ -26,17 +26,4 @@ public class HostService {
         return null;
     }//findByEmail
 
-//    private Result<Host> validate(String email) {
-//        Result<Host> result = new Result<>();
-//        if (email == null) {
-//            result.addErrorMessage("The email is null.");
-//            return result;
-//        }
-//        if(email.equals(" ")){
-//            result.addErrorMessage("Nothing is there.");
-//            return result;
-//        }
-//        return result;
-//    }//validateNulls
-
 }//end
