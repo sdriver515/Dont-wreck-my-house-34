@@ -50,26 +50,6 @@ public class ConsoleIO {
         }
     }//readRequiredString
 
-    public double readDouble(String prompt) {
-        while (true) {
-            try {
-                return Double.parseDouble(readRequiredString(prompt));
-            } catch (NumberFormatException ex) {
-                println(INVALID_NUMBER);
-            }
-        }
-    }//readDouble
-
-    public double readDouble(String prompt, double min, double max) {
-        while (true) {
-            double result = readDouble(prompt);
-            if (result >= min && result <= max) {
-                return result;
-            }
-            println(String.format(NUMBER_OUT_OF_RANGE, min, max));
-        }
-    }//readDouble
-
     public int readInt(String prompt) {
         while (true) {
             try {
@@ -90,18 +70,6 @@ public class ConsoleIO {
         }
     }//readInt
 
-    public boolean readBoolean(String prompt) {
-        while (true) {
-            String input = readRequiredString(prompt).toLowerCase();
-            if (input.equals("y")) {
-                return true;
-            } else if (input.equals("n")) {
-                return false;
-            }
-            println("[INVALID] Please enter 'y' or 'n'.");
-        }
-    }//readBoolean
-
     public LocalDate readLocalDate(String prompt) {
         while (true) {
             String input = readRequiredString(prompt);
@@ -121,16 +89,6 @@ public class ConsoleIO {
             } catch (NumberFormatException ex) {
                 println(INVALID_NUMBER);
             }
-        }
-    }//readBigDecimal
-
-    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
-        while (true) {
-            BigDecimal result = readBigDecimal(prompt);
-            if (result.compareTo(min) >= 0 && result.compareTo(max) <= 0) {
-                return result;
-            }
-            println(String.format(NUMBER_OUT_OF_RANGE, min, max));
         }
     }//readBigDecimal
 

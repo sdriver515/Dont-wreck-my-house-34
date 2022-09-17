@@ -64,6 +64,8 @@ public class Controller {
 
     //METHODS
     private void viewByHost() throws DataException {
+        view.displayHeader(MainMenuOption.VIEW_RESERVATIONS_BY_HOST.getMessage());
+
         String yesOrNo = view.viewAllHostsYesOrNo();
         if (yesOrNo.equalsIgnoreCase("yes")){
             List<Host> hosts = hostService.findAllHosts();
@@ -121,7 +123,6 @@ public class Controller {
 
     public void updateReservation() throws DataException{
         view.displayHeader(MainMenuOption.EDIT_A_RESERVATION.getMessage());
-        view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
 
         String answer = null;
         Reservation reservation;
@@ -185,7 +186,7 @@ public class Controller {
         if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
-            String successMessage = String.format("Your reservation for Ms. or Mr. %s, with host ID %s, is deleted.", reservation.getGuest().getLastNameOfGuest(), reservation.getHost().getId());
+            String successMessage = String.format("Your reservation for Ms. or Mr. %s, reservation #%s, is deleted.", reservation.getGuest().getLastNameOfGuest(), reservation.getId());
             view.displayStatus(true, successMessage);
         }
     }//deleteReservation

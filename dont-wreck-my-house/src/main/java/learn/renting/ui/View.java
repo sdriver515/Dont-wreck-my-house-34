@@ -162,8 +162,8 @@ public class View {
                         reservation.getGuest().getEmailOfGuest(),
                         reservation.getTotalCost());
             }
-            io.println("");
         }
+        io.println("");
     }//displayFutureReservations
 
     public void displayGuests(List<Guest> guests) {
