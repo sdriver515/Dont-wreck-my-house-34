@@ -9,8 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GuestServiceTest {
     GuestService service = new GuestService(new GuestRepositoryDouble());
-    //can only test:
-    //shouldFindByEmail
+
     @Test
     void shouldFindByEmail(){
         Guest actual = service.findByEmail(GuestRepositoryDouble.GUEST.getEmailOfGuest());

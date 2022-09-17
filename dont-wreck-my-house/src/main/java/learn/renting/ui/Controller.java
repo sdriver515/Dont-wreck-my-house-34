@@ -10,8 +10,11 @@ import learn.renting.models.Host;
 import learn.renting.models.Reservation;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class Controller {
@@ -46,7 +49,7 @@ public class Controller {
                 case VIEW_RESERVATIONS_BY_HOST:
                     viewByHost();
                     break;
-                case MAKE_A_RESERVATION:
+                case ADD_A_RESERVATION:
                     addReservation();
                     break;
                 case EDIT_A_RESERVATION:
@@ -68,7 +71,7 @@ public class Controller {
     }//viewByHost
 
     public void addReservation() throws DataException {
-        view.displayHeader(MainMenuOption.MAKE_A_RESERVATION.getMessage());
+        view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
         Host host = getHost();
         if(host == null){
             return;
@@ -79,7 +82,7 @@ public class Controller {
         }
         Reservation reservation = view.makeReservation(guest, host);
         Result<Reservation> result = reservationService.add(reservation);
-        if(!result.isSuccess()){//added a "not"
+        if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
             String successMessage = String.format("Reservation %s added.", reservation.getId());//changed this from the get payload thing
@@ -98,7 +101,9 @@ public class Controller {
             return;
         }
         Reservation reservation = view.putTogetherReservationForUpdating(guest, host);
+
         Result<Reservation> result = reservationService.update(reservation);
+
         if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
@@ -117,6 +122,7 @@ public class Controller {
         if(guest == null){
             return;
         }
+        viewFutureReservations(host);
         Reservation reservation = view.putTogetherReservationForDeletion(guest, host);
         List<Reservation> reservations = reservationService.findByHost(host);
         Result<Reservation> result = reservationService.delete(reservation, reservations);
@@ -140,5 +146,13 @@ public class Controller {
         Host host = hostService.findByEmail(hostEmail);
         return host;
     }//getHost
+
+    private void viewFutureReservations(Host host) throws DataException {
+        List<Reservation> reservations = reservationService.findByHost(host);
+        view.displayFutureReservations(reservations);
+        view.enterToContinue();
+    }//viewFutureReservations
+
+
 
 }//end

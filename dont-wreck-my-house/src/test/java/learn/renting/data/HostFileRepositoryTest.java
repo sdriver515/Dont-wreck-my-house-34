@@ -50,7 +50,7 @@ public class HostFileRepositoryTest {
         assertEquals("3 Nova Trail", host.getAddressOfHost());
         assertEquals("Amarillo", host.getCityOfHost());
         assertEquals("TX", host.getStateOfHost());
-        assertEquals(79182, host.getPostalCodeOfHost());
+        assertEquals("79182", host.getPostalCodeOfHost());
         assertEquals(BigDecimal.valueOf(340), host.getStandardRateOfHost());
         assertEquals(BigDecimal.valueOf(425), host.getWeekendRateOfHost());
     }//shouldReturnHost

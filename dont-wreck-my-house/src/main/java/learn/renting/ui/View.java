@@ -93,10 +93,6 @@ public class View {
         return host;
     }//chooseHost
 
-//    public String getGuestEmailPrefix() {
-//        return io.readRequiredString("Guest email starts with: ");
-//    }//getGuestEmailPrefix
-
     public Reservation makeReservation(Guest guest, Host host) {
         Reservation reservation = new Reservation();
         reservation.setHost(host);
@@ -130,29 +126,32 @@ public class View {
     }//showReservationsByHost
 
     public void makeReservation(){
-        displayHeader(MainMenuOption.MAKE_A_RESERVATION.getMessage());
+        displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
     }//makeReservation
-
 
     public void enterToContinue() {
         io.readString("Press [Enter] to continue.");
     }//enterToContinue
+    public void moveForward(BigDecimal amount){
+        System.out.println(amount);
+        io.readString("Are you ok with this amount? Yes or no? Type it here: ");
+    }//moveForward
 
     // display only
     public void displayHeader(String message) {
         io.println("");
         io.println(message);
         io.println("=".repeat(message.length()));
-    }
+    }//displayHeader
 
     public void displayException(Exception ex) {
         displayHeader("A critical error occurred:");
         io.println(ex.getMessage());
-    }
+    }//displayExemption
 
     public void displayStatus(boolean success, String message) {
         displayStatus(success, List.of(message));
-    }
+    }//displayStatus
 
     public void displayStatus(boolean success, List<String> messages) {
         displayHeader(success ? "Success" : "Error");
@@ -175,6 +174,23 @@ public class View {
                     reservation.getTotalCost());
         }
     }//displayReservations
+
+    public void displayFutureReservations(List<Reservation> reservations) {
+        if (reservations == null || reservations.isEmpty()) {
+            io.println("No reservations found.");
+            return;
+        }
+        for (Reservation reservation : reservations) {
+            if(reservation.getStartDateOfStay().isAfter(LocalDate.now())){
+                io.printf("%s: %s to %s, Guest ID# %s, $%s%n",
+                        reservation.getId(),
+                        reservation.getStartDateOfStay(),
+                        reservation.getEndDateOfStay(),
+                        reservation.getGuest().getId(),
+                        reservation.getTotalCost());
+            }
+        }
+    }//displayFutureReservations
 
     public void displayGuests(List<Guest> guests) {
 
@@ -207,26 +223,5 @@ public class View {
         }
     }//displayGuests
 
-    public void displayMapOfCategories(Map<Integer, BigDecimal> map) {
-        for (Map.Entry<Integer, BigDecimal> entry : map.entrySet()) {
-            System.out.println(entry.getKey() + ":$" + entry.getValue().toString());
-        }
-    }//displayMapOfCategories
-
-    public void displayOccupiedDatesOfHost(Map<LocalDate, LocalDate> map) {
-//        List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
-//        Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
-//        for(Reservation r : all){
-//            mapWithTimes.put(r.getStartDateOfStay(),
-//                    r.getEndDateOfStay());
-//        }
-//        return mapWithTimes;
-    }//displayOccupiedDatesOfHost
-
-    public void displayMapOfItems(Map<Integer, BigDecimal> map) {
-        for (Map.Entry<Integer, BigDecimal> entry : map.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue().toString());
-        }
-    }//displayMapOfItems
 
 }//end

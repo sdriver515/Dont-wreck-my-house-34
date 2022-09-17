@@ -4,7 +4,7 @@ package learn.renting.ui;
 
         EXIT(0, "Exit", false),
         VIEW_RESERVATIONS_BY_HOST(1,"View Reservations By Host", false),
-        MAKE_A_RESERVATION(2, "Make a Reservation", false),
+        ADD_A_RESERVATION(2, "Add a Reservation", false),
         EDIT_A_RESERVATION(3, "Edit a Reservation", false),
         CANCEL_A_RESERVATION(4, "Cancel a Reservation", false);
 

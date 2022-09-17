@@ -34,7 +34,7 @@ public class ReservationService {
 
     //CREATE
     public Result<Reservation> add(Reservation reservation) throws DataException {
-        returnCostOfStay(reservation);//I JUST ADDED
+        returnCostOfStay(reservation);
         Result<Reservation> result = validateAdd(reservation);
         if (!result.isSuccess()) {
             return result;
@@ -58,16 +58,16 @@ public class ReservationService {
 
     //update reservation
     public Result<Reservation> update(Reservation reservation) throws DataException {
-        Result<Reservation> result = new Result<>();//JUST ADDED THIS
+        Result<Reservation> result = new Result<>();
         result = validateUpdate(reservation);
-        returnCostOfStay(reservation);//I JUST ADDED
+        returnCostOfStay(reservation);
         if(!result.isSuccess()){
             return result;
         }
         if(!reservationRepository.updateReservation(reservation)){
             result.addErrorMessage("Reservation does not exist.");
         }
-        reservationRepository.updateReservation(reservation);//added this
+        reservationRepository.updateReservation(reservation);
         return result;
     }//update
 
