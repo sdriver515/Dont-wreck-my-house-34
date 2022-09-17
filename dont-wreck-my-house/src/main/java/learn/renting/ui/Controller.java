@@ -83,12 +83,7 @@ public class Controller {
 
     public void addReservation() throws DataException {
         view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
-        String yesOrNo = view.viewAllHostsYesOrNo();
-        if (yesOrNo.equalsIgnoreCase("yes")){
-            List<Host> hosts = hostService.findAllHosts();
-            view.displayHeader("All Hosts in Database: ");
-            view.displayHosts(hosts);
-        }
+        yesOrNoForHosts();
         Host host = getHost();
         if(host == null){
             view.displayHeader("This host does not exist.");
@@ -97,6 +92,7 @@ public class Controller {
         List<Reservation> reservations = reservationService.findByHost(host);
         view.displayReservations(reservations);
 
+        yesOrNoForGuests();
         Guest guest = getGuest();
         if(guest == null){
             view.displayHeader("This guest does not exist.");
@@ -116,17 +112,14 @@ public class Controller {
     public void updateReservation() throws DataException{
         view.displayHeader(MainMenuOption.EDIT_A_RESERVATION.getMessage());
         view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
-        String yesOrNo = view.viewAllHostsYesOrNo();
-        if(yesOrNo.equalsIgnoreCase("yes")){
-            List<Host> hosts = hostService.findAllHosts();
-            view.displayHeader("All Hosts in Database: ");
-            view.displayHosts(hosts);
-        }
+
+        yesOrNoForHosts();
         Host host = getHost();
 
         List<Reservation> reservations = reservationService.findByHost(host);
         view.displayFutureReservations(reservations);
 
+        yesOrNoForGuests();
         Guest guest = getGuest();
         String answer = null;
         Reservation reservation;
@@ -158,25 +151,21 @@ public class Controller {
 
     public void deleteReservation() throws DataException{
         view.displayHeader(MainMenuOption.CANCEL_A_RESERVATION.getMessage());
-        String yesOrNo = view.viewAllHostsYesOrNo();
-        if(yesOrNo.equalsIgnoreCase("yes")){
-            List<Host> hosts = hostService.findAllHosts();
-            view.displayHeader("All Hosts in Database: ");
-            view.displayHosts(hosts);
-        }
+        yesOrNoForHosts();
         Host host = getHost();
-        Guest guest = getGuest();
         if(host == null){
             view.displayHeader("This host does not exist.");
             return;
         }
+        List<Reservation> reservations = reservationService.findByHost(host);
+        view.displayFutureReservations(reservations);
+
+        yesOrNoForGuests();
+        Guest guest = getGuest();
         if(guest == null){
             view.displayHeader("This guest does not exist.");
             return;
         }
-
-        List<Reservation> reservations = reservationService.findByHost(host);
-        view.displayFutureReservations(reservations);
 
         Reservation reservation = view.putTogetherReservationForDeletion(guest, host);
 
@@ -201,5 +190,23 @@ public class Controller {
         Host host = hostService.findByEmail(hostEmail);
         return host;
     }//getHost
+
+    private void yesOrNoForHosts(){
+        String yesOrNo = view.viewAllHostsYesOrNo();
+        if(yesOrNo.equalsIgnoreCase("yes")){
+            List<Host> hosts = hostService.findAllHosts();
+            view.displayHeader("All Hosts in Database: ");
+            view.displayHosts(hosts);
+        }
+    }//yesOrNoForHosts
+
+    private void yesOrNoForGuests(){
+        String yesOrNo = view.viewAllGuestsYesOrNo();
+        if(yesOrNo.equalsIgnoreCase("yes")){
+            List<Guest> guests = guestService.findAllGuests();
+            view.displayHeader("All Guests in Database: ");
+            view.displayGuests(guests);
+        }
+    }//yesOrNoForGuests
 
 }//end

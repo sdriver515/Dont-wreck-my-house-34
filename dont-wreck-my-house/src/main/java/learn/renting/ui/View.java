@@ -100,7 +100,13 @@ public class View {
         System.out.println("Do you want to view a list all hosts in the database?");
         String answer = io.readString("Enter yes or no: ");
         return answer;
-    }//yesOrNo
+    }//viewAllHostsYesOrNo
+
+    public String viewAllGuestsYesOrNo(){
+        System.out.println("Do you want to view a list all guests in the database?");
+        String answer = io.readString("Enter yes or no: ");
+        return answer;
+    }//viewAllGuestsYesOrNo
 
     // display only
     public void displayHeader(String message) {
@@ -126,9 +132,11 @@ public class View {
     }//displayStatus
 
     public void displayReservations(List<Reservation> reservations) {
+        io.println("");
         io.println("* ALL RESERVATION INFO *");
         if (reservations == null || reservations.isEmpty()) {
             io.println("No reservations found.");
+            io.println("");
             return;
         }
         for (Reservation reservation : reservations) {
@@ -140,12 +148,15 @@ public class View {
                     reservation.getGuest().getEmailOfGuest(),
                     reservation.getTotalCost());
         }
+        io.println("");
     }//displayReservations
 
     public void displayFutureReservations(List<Reservation> reservations) {
+        io.println("");
         io.println("* FUTURE RESERVATION INFO *");
         if (reservations == null || reservations.isEmpty()) {
             io.println("No reservations found.");
+            io.println("");
             return;
         }
         for (Reservation reservation : reservations) {
@@ -158,6 +169,7 @@ public class View {
                         reservation.getGuest().getEmailOfGuest(),
                         reservation.getTotalCost());
             }
+            io.println("");
         }
     }//displayFutureReservations
 
