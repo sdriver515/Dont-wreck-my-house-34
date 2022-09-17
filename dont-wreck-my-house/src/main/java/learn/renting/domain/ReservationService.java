@@ -56,35 +56,56 @@ public class ReservationService {
         return listResult;
     }//findByHost
 
+//    //update reservation - original
+//    public Result<Reservation> update(Reservation reservation) throws DataException {
+//        Result<Reservation> result = new Result<>();
+//        result = validateUpdate(reservation);
+//        returnCostOfStay(reservation);
+//        if(!result.isSuccess()){
+//            return result;
+//        }
+//        if(!reservationRepository.updateReservation(reservation)){
+//            result.addErrorMessage("Reservation does not exist.");
+//        }
+//        reservationRepository.updateReservation(reservation);
+//        return result;
+//    }//update
+
     //update reservation
     public Result<Reservation> update(Reservation reservation) throws DataException {
         Result<Reservation> result = new Result<>();
-        result = validateUpdate(reservation);
-        returnCostOfStay(reservation);
-        if(!result.isSuccess()){
-            return result;
-        }
-        if(!reservationRepository.updateReservation(reservation)){
-            result.addErrorMessage("Reservation does not exist.");
-        }
-        reservationRepository.updateReservation(reservation);
-        return result;
+                result = validateUpdate(reservation);
+//                returnCostOfStay(reservation);
+
+                reservation.setTotalCost(returnCostOfStayBD(reservation));
+
+                if(!result.isSuccess()){
+                    return result;
+                }
+                if(!reservationRepository.updateReservation(reservation)){
+                    result.addErrorMessage("Reservation does not exist.");
+                }
+                reservationRepository.updateReservation(reservation);
+                return result;
     }//update
 
     //delete reservation
     public Result<Reservation> delete(Reservation reservation, List<Reservation> reservations) throws DataException {
         Result<Reservation> result = new Result<>();
         for(Reservation r : reservations){
-            if(r.getEndDateOfStay().isBefore(LocalDate.now())){
-                result.addErrorMessage("Past reservations cannot be deleted.");
+            if(r.getStartDateOfStay().equals(reservation.getStartDateOfStay())){
+                if(reservation.getEndDateOfStay().isBefore(LocalDate.now())){
+                    result.addErrorMessage("Past reservations cannot be deleted.");
+                    return result;
+                }
+            }
+            if(!reservationRepository.deleteReservation(reservation)){
+                result.addErrorMessage("Reservation does not exist.");
                 return result;
             }
-        }
-        if(!reservationRepository.deleteReservation(reservation)){
-            result.addErrorMessage("Reservation does not exist.");
+            reservationRepository.deleteReservation(reservation);//added this
             return result;
-        }
-        reservationRepository.deleteReservation(reservation);//added this
+            }
         return result;
     }//delete
 
@@ -191,6 +212,30 @@ public class ReservationService {
         reservation.setTotalCost(totalCost);
     }//returnCostOfStayAtHost
 
+    public BigDecimal returnCostOfStayBD(Reservation reservation){
+        LocalDate day = reservation.getStartDateOfStay();
+        BigDecimal totalCost = BigDecimal.ZERO;
+        do{
+            totalCost = trueIfIsWeekendRate(day)?
+                    totalCost.add(reservation.getHost().getWeekendRateOfHost()):
+                    totalCost.add(reservation.getHost().getStandardRateOfHost());
+            day = day.plusDays(1);
+        }while(day.isBefore(reservation.getEndDateOfStay()));
+        return totalCost;
+    }//returnCostOfStayAtHost
+
+    public String stringCostOfStay(Reservation reservation){
+        LocalDate day = reservation.getStartDateOfStay();
+        BigDecimal totalCost = BigDecimal.ZERO;
+        do{
+            totalCost = trueIfIsWeekendRate(day)?
+                    totalCost.add(reservation.getHost().getWeekendRateOfHost()):
+                    totalCost.add(reservation.getHost().getStandardRateOfHost());
+            day = day.plusDays(1);
+        }while(day.isBefore(reservation.getEndDateOfStay()));
+        String totalCostString = String.valueOf(totalCost);
+        return totalCostString;
+    }//stringCostOfStay
 
     private boolean trueIfIsWeekendRate(LocalDate dayOfWeek) {
        DayOfWeek day = DayOfWeek.of(dayOfWeek.get(ChronoField.DAY_OF_WEEK));
@@ -205,7 +250,8 @@ public class ReservationService {
     }//trueIfEqualsItself
 
     private boolean trueIfHostDoesNotExist(Reservation reservation) throws DataException{
-        if(!reservation.getHost().equals(hostRepository.findByHostId(reservation.getHost().getId()))){
+        String id = String.valueOf(hostRepository.findByHostId(reservation.getHost().getId()).getId());
+        if(!reservation.getHost().getId().equalsIgnoreCase(id)){
             return true;
         }
         return false;
@@ -232,15 +278,5 @@ public class ReservationService {
         }
         return false;
     }//trueIfEndDateIsBeforeStartDates
-
-//    public Map<LocalDate, LocalDate> displayOccupiedDatesOfHost(Reservation reservation) throws DataException {
-//        List<Reservation> all = reservationRepository.findByHost(reservation.getHost());
-//        Map<LocalDate, LocalDate> mapWithTimes = new HashMap<>();
-//        for(Reservation r : all){
-//            mapWithTimes.put(r.getStartDateOfStay(),
-//                    r.getEndDateOfStay());
-//        }
-//        return mapWithTimes;
-//    }//displayOccupiedDatesOfHost
 
 }//end

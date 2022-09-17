@@ -2,6 +2,7 @@ package learn.renting.domain;
 
 import learn.renting.data.GuestRepository;
 import learn.renting.models.Guest;
+import learn.renting.models.Host;
 import learn.renting.models.Reservation;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +25,10 @@ public class GuestService {
         }
         return null;
     }//findByEmail
+
+    public List<Guest> findAllGuests(){
+        List<Guest> all = repository.findAll();
+        return all;
+    }//findAllGuests
 
 }//end

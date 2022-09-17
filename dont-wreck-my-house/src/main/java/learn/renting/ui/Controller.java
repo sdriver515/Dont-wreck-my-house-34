@@ -62,79 +62,134 @@ public class Controller {
         } while (option != MainMenuOption.EXIT);
     }
 
-//     top level menu
+    //METHODS
     private void viewByHost() throws DataException {
+        String yesOrNo = view.viewAllHostsYesOrNo();
+        if (yesOrNo.equalsIgnoreCase("yes")){
+            List<Host> hosts = hostService.findAllHosts();
+            view.displayHeader("All Hosts in Database: ");
+            view.displayHosts(hosts);
+        }
         Host host = getHost();
-        List<Reservation> reservations = reservationService.findByHost(host);
-        view.displayReservations(reservations);
+        if(host == null){
+            view.displayHeader("This host does not exist.");
+            return;
+        } else {
+            List<Reservation> reservations = reservationService.findByHost(host);
+            view.displayReservations(reservations);
+        }
         view.enterToContinue();
     }//viewByHost
 
     public void addReservation() throws DataException {
         view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
+        String yesOrNo = view.viewAllHostsYesOrNo();
+        if (yesOrNo.equalsIgnoreCase("yes")){
+            List<Host> hosts = hostService.findAllHosts();
+            view.displayHeader("All Hosts in Database: ");
+            view.displayHosts(hosts);
+        }
         Host host = getHost();
         if(host == null){
+            view.displayHeader("This host does not exist.");
             return;
         }
+        List<Reservation> reservations = reservationService.findByHost(host);
+        view.displayReservations(reservations);
+
         Guest guest = getGuest();
         if(guest == null){
+            view.displayHeader("This guest does not exist.");
             return;
         }
+
         Reservation reservation = view.makeReservation(guest, host);
         Result<Reservation> result = reservationService.add(reservation);
         if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
-            String successMessage = String.format("Reservation %s added.", reservation.getId());//changed this from the get payload thing
+            String successMessage = String.format("Reservation %s added.", reservation.getId());
             view.displayStatus(true, successMessage);
         }
     }//addReservation
 
     public void updateReservation() throws DataException{
         view.displayHeader(MainMenuOption.EDIT_A_RESERVATION.getMessage());
+        view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
+        String yesOrNo = view.viewAllHostsYesOrNo();
+        if(yesOrNo.equalsIgnoreCase("yes")){
+            List<Host> hosts = hostService.findAllHosts();
+            view.displayHeader("All Hosts in Database: ");
+            view.displayHosts(hosts);
+        }
         Host host = getHost();
+
+        List<Reservation> reservations = reservationService.findByHost(host);
+        view.displayFutureReservations(reservations);
+
         Guest guest = getGuest();
+        String answer = null;
+        Reservation reservation;
         if(host == null){
+            view.displayHeader("This host does not exist.");
             return;
         }
         if(guest == null){
+            view.displayHeader("This guest does not exist.");
             return;
         }
-        Reservation reservation = view.putTogetherReservationForUpdating(guest, host);
+        do{
+        reservation = view.putTogetherReservationForUpdating(guest, host);
 
+        String totalCostString = reservationService.stringCostOfStay(reservation);
+
+        answer = view.moveForward(totalCostString);
+
+        } while (answer.equalsIgnoreCase("no"));
         Result<Reservation> result = reservationService.update(reservation);
 
         if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
-            String successMessage = String.format("Your reservation for %s guest with %s host is updated.", reservation.getGuest().getLastNameOfGuest(), reservation.getHost().getId());
+            String successMessage = String.format("Your reservation for Ms. or Mr. %s, reservation #%s, is updated.", reservation.getGuest().getLastNameOfGuest(), reservation.getId());
             view.displayStatus(true, successMessage);
         }
     }//updateReservation
 
     public void deleteReservation() throws DataException{
         view.displayHeader(MainMenuOption.CANCEL_A_RESERVATION.getMessage());
+        String yesOrNo = view.viewAllHostsYesOrNo();
+        if(yesOrNo.equalsIgnoreCase("yes")){
+            List<Host> hosts = hostService.findAllHosts();
+            view.displayHeader("All Hosts in Database: ");
+            view.displayHosts(hosts);
+        }
         Host host = getHost();
         Guest guest = getGuest();
         if(host == null){
+            view.displayHeader("This host does not exist.");
             return;
         }
         if(guest == null){
+            view.displayHeader("This guest does not exist.");
             return;
         }
-        viewFutureReservations(host);
-        Reservation reservation = view.putTogetherReservationForDeletion(guest, host);
+
         List<Reservation> reservations = reservationService.findByHost(host);
+        view.displayFutureReservations(reservations);
+
+        Reservation reservation = view.putTogetherReservationForDeletion(guest, host);
+
         Result<Reservation> result = reservationService.delete(reservation, reservations);
         if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
-            String successMessage = String.format("Your reservation for %s guest with %s host is deleted.", reservation.getGuest().getLastNameOfGuest(), reservation.getHost().getId());
+            String successMessage = String.format("Your reservation for Ms. or Mr. %s, with host ID %s, is deleted.", reservation.getGuest().getLastNameOfGuest(), reservation.getHost().getId());
             view.displayStatus(true, successMessage);
         }
     }//deleteReservation
 
-    // support methods
+    // HELPER METHODS
     private Guest getGuest() {
         String guestEmail = view.getGuestEmail();
         Guest guest = guestService.findByEmail(guestEmail);
@@ -146,13 +201,5 @@ public class Controller {
         Host host = hostService.findByEmail(hostEmail);
         return host;
     }//getHost
-
-    private void viewFutureReservations(Host host) throws DataException {
-        List<Reservation> reservations = reservationService.findByHost(host);
-        view.displayFutureReservations(reservations);
-        view.enterToContinue();
-    }//viewFutureReservations
-
-
 
 }//end

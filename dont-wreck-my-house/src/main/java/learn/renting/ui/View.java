@@ -34,64 +34,22 @@ public class View {
             max = Math.max(max, option.getValue());
         }
 
-        String message = String.format("Select [%s-%s]: ", min, max - 1);
+        String message = String.format("Select [%s-%s]: ", min, max);
         return MainMenuOption.fromValue(io.readInt(message, min, max));
     }
 
     public String viewReservationsByHost() {
         displayHeader(MainMenuOption.VIEW_RESERVATIONS_BY_HOST.getMessage());
-        return io.readRequiredString("Select a host email: ");
+        return io.readRequiredString("Enter a host email: ");
     }//viewReservationsByHost
 
     public String getHostEmail() {//
-        return io.readString("Select a Host Email: ");
+        return io.readString("Enter a Host Email: ");
     }//getHostEmail
 
     public String getGuestEmail() {//
-        return io.readString("Select a Guest Email: ");
+        return io.readString("Enter a Guest Email: ");
     }//getGuestEmail
-
-    public Guest chooseGuest(List<Guest> guests) {
-
-        displayGuests(guests);
-
-        if (guests.size() == 0) {
-            return null;
-        }
-
-        int guestId = io.readInt("Select a guest ID: ");
-        Guest guest = guests.stream()
-                .filter(i -> i.getId() == guestId)
-                .findFirst()
-                .orElse(null);
-
-        if (guest == null) {
-            displayStatus(false, String.format("No guest with ID %s found.", guestId));
-        }
-
-        return guest;
-    }//chooseGuest
-
-    public Host chooseHost(List<Host> hosts) {
-
-        displayHosts(hosts);
-
-        if (hosts.size() == 0) {
-            return null;
-        }
-
-        String hostId = io.readString("Select a host ID: ");
-        Host host = hosts.stream()
-                .filter(i -> i.getId() == hostId)
-                .findFirst()
-                .orElse(null);
-
-        if (host == null) {
-            displayStatus(false, String.format("No host with ID %s found.", hostId));
-        }
-
-        return host;
-    }//chooseHost
 
     public Reservation makeReservation(Guest guest, Host host) {
         Reservation reservation = new Reservation();
@@ -107,7 +65,7 @@ public class View {
         Reservation update = new Reservation();
         update.setGuest(guest);
         update.setHost(host);
-        update.setId(io.readInt("Choose a reservation ID to update: "));
+        update.setId(io.readInt("Choose a reservation # to update: "));
         update.setStartDateOfStay(io.readLocalDate("Start date [MM/dd/yyyy]: "));
         update.setEndDateOfStay(io.readLocalDate("End date [MM/dd/yyyy]: "));
         return update;
@@ -117,7 +75,7 @@ public class View {
         Reservation toDelete = new Reservation();
         toDelete.setGuest(guest);
         toDelete.setHost(host);
-        toDelete.setId(io.readInt("Choose a reservation ID to delete: "));
+        toDelete.setId(io.readInt("Choose a reservation # to delete: "));
         return toDelete;
     }//putTogetherReservationForDeletion
 
@@ -132,10 +90,17 @@ public class View {
     public void enterToContinue() {
         io.readString("Press [Enter] to continue.");
     }//enterToContinue
-    public void moveForward(BigDecimal amount){
-        System.out.println(amount);
-        io.readString("Are you ok with this amount? Yes or no? Type it here: ");
+    public String moveForward(String amount){
+        System.out.printf("$%s%n", amount);
+        String answer = io.readString("Are you ok with this amount? Yes or no? Type it here: ");
+        return answer;
     }//moveForward
+
+    public String viewAllHostsYesOrNo(){
+        System.out.println("Do you want to view a list all hosts in the database?");
+        String answer = io.readString("Enter yes or no: ");
+        return answer;
+    }//yesOrNo
 
     // display only
     public void displayHeader(String message) {
@@ -161,32 +126,36 @@ public class View {
     }//displayStatus
 
     public void displayReservations(List<Reservation> reservations) {
+        io.println("* ALL RESERVATION INFO *");
         if (reservations == null || reservations.isEmpty()) {
             io.println("No reservations found.");
             return;
         }
         for (Reservation reservation : reservations) {
-            io.printf("%s: %s to %s, Guest ID# %s, $%s%n",
+            io.printf("Reservation# %s: %s to %s, Guest ID %s / %s, $%s %n",
                     reservation.getId(),
                     reservation.getStartDateOfStay(),
                     reservation.getEndDateOfStay(),
                     reservation.getGuest().getId(),
+                    reservation.getGuest().getEmailOfGuest(),
                     reservation.getTotalCost());
         }
     }//displayReservations
 
     public void displayFutureReservations(List<Reservation> reservations) {
+        io.println("* FUTURE RESERVATION INFO *");
         if (reservations == null || reservations.isEmpty()) {
             io.println("No reservations found.");
             return;
         }
         for (Reservation reservation : reservations) {
             if(reservation.getStartDateOfStay().isAfter(LocalDate.now())){
-                io.printf("%s: %s to %s, Guest ID# %s, $%s%n",
+                io.printf("Reservation# %s: %s to %s, Guest ID %s / %s, $%s %n",
                         reservation.getId(),
                         reservation.getStartDateOfStay(),
                         reservation.getEndDateOfStay(),
                         reservation.getGuest().getId(),
+                        reservation.getGuest().getEmailOfGuest(),
                         reservation.getTotalCost());
             }
         }
@@ -199,7 +168,7 @@ public class View {
         }
 
         for (Guest guest : guests) {
-            io.printf("%s: %s, %s, %s $/kg%n",
+            io.printf("%s: %s, %s, %s %n",
                     guest.getId(),
                     guest.getLastNameOfGuest(),
                     guest.getEmailOfGuest(),
@@ -214,7 +183,7 @@ public class View {
         }
 
         for (Host host : hosts) {
-            io.printf("%s: %s, %s, %s, %s, %s %n",
+            io.printf("ID %s: %s, %s, $%s, $%s %n",
                     host.getId(),
                     host.getLastNameOfHost(),
                     host.getEmailOfHost(),

@@ -16,7 +16,6 @@ public class HostService {
     }
 
     public Host findByEmail(String email){
-//        validate(email);
         List<Host> all = repository.findAll();
         for (Host i : all){
             if(i.getEmailOfHost().equals(email)){
@@ -25,5 +24,10 @@ public class HostService {
         }
         return null;
     }//findByEmail
+
+    public List<Host> findAllHosts(){
+        List<Host> all = repository.findAll();
+        return all;
+    }//findAllHosts
 
 }//end
