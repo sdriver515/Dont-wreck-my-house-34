@@ -10,6 +10,7 @@ import learn.renting.models.Reservation;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
@@ -34,8 +35,10 @@ public class ReservationService {
 
     //CREATE
     public Result<Reservation> add(Reservation reservation) throws DataException {
-        returnCostOfStay(reservation);
         Result<Reservation> result = validateAdd(reservation);
+
+        reservation.setTotalCost(returnCostOfStay(reservation));
+
         if (!result.isSuccess()) {
             return result;
         }
@@ -56,28 +59,12 @@ public class ReservationService {
         return listResult;
     }//findByHost
 
-//    //update reservation - original
-//    public Result<Reservation> update(Reservation reservation) throws DataException {
-//        Result<Reservation> result = new Result<>();
-//        result = validateUpdate(reservation);
-//        returnCostOfStay(reservation);
-//        if(!result.isSuccess()){
-//            return result;
-//        }
-//        if(!reservationRepository.updateReservation(reservation)){
-//            result.addErrorMessage("Reservation does not exist.");
-//        }
-//        reservationRepository.updateReservation(reservation);
-//        return result;
-//    }//update
-
     //update reservation
     public Result<Reservation> update(Reservation reservation) throws DataException {
         Result<Reservation> result = new Result<>();
                 result = validateUpdate(reservation);
-//                returnCostOfStay(reservation);
 
-                reservation.setTotalCost(returnCostOfStayBD(reservation));
+                reservation.setTotalCost(returnCostOfStay(reservation));
 
                 if(!result.isSuccess()){
                     return result;
@@ -195,12 +182,13 @@ public class ReservationService {
         if(newReservation.getStartDateOfStay().isAfter(newReservation.getEndDateOfStay())){
             result.addErrorMessage("Start date must be before end date.");
         }
-        if(newReservation.getStartDateOfStay().isEqual(newReservation.getEndDateOfStay())){//I added
-            result.addErrorMessage("Start and end date cnanot be the same.");
+        if(newReservation.getStartDateOfStay().isEqual(newReservation.getEndDateOfStay())){
+            result.addErrorMessage("Start and end date cannot be the same.");
         }
+
     }//validateDuplicates
 
-    public void returnCostOfStay(Reservation reservation){
+    public BigDecimal returnCostOfStay(Reservation reservation){
         LocalDate day = reservation.getStartDateOfStay();
         BigDecimal totalCost = BigDecimal.ZERO;
         do{
@@ -209,33 +197,8 @@ public class ReservationService {
                     totalCost.add(reservation.getHost().getStandardRateOfHost());
             day = day.plusDays(1);
         }while(day.isBefore(reservation.getEndDateOfStay()));
-        reservation.setTotalCost(totalCost);
-    }//returnCostOfStayAtHost
-
-    public BigDecimal returnCostOfStayBD(Reservation reservation){
-        LocalDate day = reservation.getStartDateOfStay();
-        BigDecimal totalCost = BigDecimal.ZERO;
-        do{
-            totalCost = trueIfIsWeekendRate(day)?
-                    totalCost.add(reservation.getHost().getWeekendRateOfHost()):
-                    totalCost.add(reservation.getHost().getStandardRateOfHost());
-            day = day.plusDays(1);
-        }while(day.isBefore(reservation.getEndDateOfStay()));
-        return totalCost;
-    }//returnCostOfStayAtHost
-
-    public String stringCostOfStay(Reservation reservation){
-        LocalDate day = reservation.getStartDateOfStay();
-        BigDecimal totalCost = BigDecimal.ZERO;
-        do{
-            totalCost = trueIfIsWeekendRate(day)?
-                    totalCost.add(reservation.getHost().getWeekendRateOfHost()):
-                    totalCost.add(reservation.getHost().getStandardRateOfHost());
-            day = day.plusDays(1);
-        }while(day.isBefore(reservation.getEndDateOfStay()));
-        String totalCostString = String.valueOf(totalCost);
-        return totalCostString;
-    }//stringCostOfStay
+        return totalCost.setScale(2, RoundingMode.HALF_EVEN);
+    }//returnCostOfStay
 
     private boolean trueIfIsWeekendRate(LocalDate dayOfWeek) {
        DayOfWeek day = DayOfWeek.of(dayOfWeek.get(ChronoField.DAY_OF_WEEK));

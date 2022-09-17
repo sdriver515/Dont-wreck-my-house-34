@@ -6,6 +6,8 @@ import learn.renting.models.Guest;
 import learn.renting.models.Host;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -18,8 +20,7 @@ public class HostServiceTest {
         Host actual = service.findByEmail(HostRepositoryDouble.HOST.getEmailOfHost());
         assertNotNull(actual);
         assertEquals(HostRepositoryDouble.HOST.getLastNameOfHost(), actual.getLastNameOfHost());
-    }
-    //shouldNotFindBlaankEmail
+    }//shouldFindByEmail
     @Test
     void shouldNotFindBlankEmail(){
         Host actual = service.findByEmail(" ");
@@ -31,5 +32,18 @@ public class HostServiceTest {
         Host actual = service.findByEmail(null);
         assertNull(actual);
     }//shouldNotFindNullEmail
+
+    @Test
+    void shouldFindAll(){
+        List<Host> list = service.findAllHosts();
+        assertNotNull(list);
+        assertEquals(2, list.size());
+    }//shouldFindAll
+
+    @Test
+    void shouldNotFindWrongListOfHosts(){
+        List<Host> list = service.findAllHosts();
+        assertNotEquals(6, list.size());
+    }//shouldNotFindWrongListOfHosts
 
 }//end

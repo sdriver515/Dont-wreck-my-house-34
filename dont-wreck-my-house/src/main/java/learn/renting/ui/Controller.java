@@ -83,6 +83,10 @@ public class Controller {
 
     public void addReservation() throws DataException {
         view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
+
+        String answer = null;
+        Reservation reservation;
+
         yesOrNoForHosts();
         Host host = getHost();
         if(host == null){
@@ -99,8 +103,14 @@ public class Controller {
             return;
         }
 
-        Reservation reservation = view.makeReservation(guest, host);
+        do {
+            reservation = view.putTogetherReservationForAdding(guest, host);
+            BigDecimal totalCost = reservationService.returnCostOfStay(reservation);
+            answer = view.moveForward(totalCost);
+        } while (answer.equalsIgnoreCase("no"));
+
         Result<Reservation> result = reservationService.add(reservation);
+
         if(!result.isSuccess()){
             view.displayStatus(false, result.getErrorMessages());
         } else {
@@ -113,6 +123,9 @@ public class Controller {
         view.displayHeader(MainMenuOption.EDIT_A_RESERVATION.getMessage());
         view.displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
 
+        String answer = null;
+        Reservation reservation;
+
         yesOrNoForHosts();
         Host host = getHost();
 
@@ -121,8 +134,7 @@ public class Controller {
 
         yesOrNoForGuests();
         Guest guest = getGuest();
-        String answer = null;
-        Reservation reservation;
+
         if(host == null){
             view.displayHeader("This host does not exist.");
             return;
@@ -131,14 +143,13 @@ public class Controller {
             view.displayHeader("This guest does not exist.");
             return;
         }
+
         do{
         reservation = view.putTogetherReservationForUpdating(guest, host);
-
-        String totalCostString = reservationService.stringCostOfStay(reservation);
-
-        answer = view.moveForward(totalCostString);
-
+        BigDecimal totalCost = reservationService.returnCostOfStay(reservation);
+        answer = view.moveForward(totalCost);
         } while (answer.equalsIgnoreCase("no"));
+
         Result<Reservation> result = reservationService.update(reservation);
 
         if(!result.isSuccess()){
@@ -152,6 +163,7 @@ public class Controller {
     public void deleteReservation() throws DataException{
         view.displayHeader(MainMenuOption.CANCEL_A_RESERVATION.getMessage());
         yesOrNoForHosts();
+
         Host host = getHost();
         if(host == null){
             view.displayHeader("This host does not exist.");

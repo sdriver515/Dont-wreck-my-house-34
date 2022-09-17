@@ -41,7 +41,6 @@ public class ReservationFileRepositoryTest {
     }//setup
 
     //CREATE
-
     @Test
     void shouldAdd() throws DataException {
         Reservation reservation = new Reservation();
@@ -58,7 +57,8 @@ public class ReservationFileRepositoryTest {
         reservation.setHost(host);
 
         reservation = repository.add(reservation);
-        System.out.println(reservation.getGuest().getId());
+        assertNotNull(reservation);
+        assertEquals(12, reservation.getGuest().getId());
     }//shouldAdd
 
     //READ

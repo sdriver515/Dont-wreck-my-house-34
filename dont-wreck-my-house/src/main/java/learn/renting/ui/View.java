@@ -36,12 +36,7 @@ public class View {
 
         String message = String.format("Select [%s-%s]: ", min, max);
         return MainMenuOption.fromValue(io.readInt(message, min, max));
-    }
-
-    public String viewReservationsByHost() {
-        displayHeader(MainMenuOption.VIEW_RESERVATIONS_BY_HOST.getMessage());
-        return io.readRequiredString("Enter a host email: ");
-    }//viewReservationsByHost
+    }//selectMainMenuOption
 
     public String getHostEmail() {//
         return io.readString("Enter a Host Email: ");
@@ -51,15 +46,16 @@ public class View {
         return io.readString("Enter a Guest Email: ");
     }//getGuestEmail
 
-    public Reservation makeReservation(Guest guest, Host host) {
+    public Reservation putTogetherReservationForAdding(Guest guest, Host host) {
         Reservation reservation = new Reservation();
         reservation.setHost(host);
         reservation.setId(reservation.getId());
         reservation.setStartDateOfStay(io.readLocalDate("Start date [MM/dd/yyyy]: "));
         reservation.setEndDateOfStay(io.readLocalDate("End date [MM/dd/yyyy]: "));
         reservation.setGuest(guest);
+        io.println("");
         return reservation;
-    }//makeReservation
+    }//putTogetherReservationForAdding
 
     public Reservation putTogetherReservationForUpdating(Guest guest, Host host){
         Reservation update = new Reservation();
@@ -68,6 +64,7 @@ public class View {
         update.setId(io.readInt("Choose a reservation # to update: "));
         update.setStartDateOfStay(io.readLocalDate("Start date [MM/dd/yyyy]: "));
         update.setEndDateOfStay(io.readLocalDate("End date [MM/dd/yyyy]: "));
+        io.println("");
         return update;
     }//putTogetherReservationForUpdating
 
@@ -76,35 +73,31 @@ public class View {
         toDelete.setGuest(guest);
         toDelete.setHost(host);
         toDelete.setId(io.readInt("Choose a reservation # to delete: "));
+        io.println("");
         return toDelete;
     }//putTogetherReservationForDeletion
-
-    public void showReservationsByHost(){
-        displayHeader(MainMenuOption.VIEW_RESERVATIONS_BY_HOST.getMessage());
-    }//showReservationsByHost
-
-    public void makeReservation(){
-        displayHeader(MainMenuOption.ADD_A_RESERVATION.getMessage());
-    }//makeReservation
 
     public void enterToContinue() {
         io.readString("Press [Enter] to continue.");
     }//enterToContinue
-    public String moveForward(String amount){
-        System.out.printf("$%s%n", amount);
+    public String moveForward(BigDecimal amount){
+        System.out.printf("We think this will cost $%s%n", amount);
         String answer = io.readString("Are you ok with this amount? Yes or no? Type it here: ");
+        io.println("");
         return answer;
     }//moveForward
 
     public String viewAllHostsYesOrNo(){
         System.out.println("Do you want to view a list all hosts in the database?");
         String answer = io.readString("Enter yes or no: ");
+        io.println("");
         return answer;
     }//viewAllHostsYesOrNo
 
     public String viewAllGuestsYesOrNo(){
         System.out.println("Do you want to view a list all guests in the database?");
         String answer = io.readString("Enter yes or no: ");
+        io.println("");
         return answer;
     }//viewAllGuestsYesOrNo
 
@@ -186,6 +179,7 @@ public class View {
                     guest.getEmailOfGuest(),
                     guest.getStateOfGuest());
         }
+        io.println("");
     }//displayGuests
 
     public void displayHosts(List<Host> hosts) {
@@ -202,7 +196,7 @@ public class View {
                     host.getStandardRateOfHost(),
                     host.getWeekendRateOfHost());
         }
-    }//displayGuests
-
+        io.println("");
+    }//displayHosts
 
 }//end

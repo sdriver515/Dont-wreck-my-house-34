@@ -7,6 +7,7 @@ import learn.renting.models.Reservation;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,21 +28,6 @@ public class ReservationServiceTest {
     private final ArrayList<Reservation> reservations = new ArrayList<>();
 
     //CREATE
-    @Test
-    void shouldAddReservation() throws DataException {
-        Reservation reservation = new Reservation();
-        reservation.setGuest(GuestRepositoryDouble.GUEST);
-        reservation.setHost(HostRepositoryDouble.HOST);
-        reservation.setStartDateOfStay(LocalDate.of(2022,12,12));
-        reservation.setEndDateOfStay(LocalDate.of(2022,12,13));
-
-        service.returnCostOfStay(reservation);
-
-        Result<Reservation> result = service.add(reservation);
-        assertTrue(result.isSuccess());
-        assertNotNull(result.getPayload());
-    }//shouldAddReservation
-
     @Test
     void shouldAdd() throws DataException {
         Reservation reservation = new Reservation();
@@ -72,6 +58,38 @@ public class ReservationServiceTest {
         assertNull(result.getPayload());
         assertTrue(result.getErrorMessages().get(0).contains("past"));
     }//shouldNotAddReservationIfDateIsInThePast
+
+    @Test
+    void shouldNotAddReservationIfDatesOverlap() throws DataException {
+        Reservation reservation = new Reservation();
+        reservation.setGuest(GuestRepositoryDouble.GUEST);
+        reservation.setHost(HostRepositoryDouble.HOST);
+        reservation.setStartDateOfStay(LocalDate.of(2022,10,13));
+        reservation.setEndDateOfStay(LocalDate.of(2022,10,13));
+
+        service.returnCostOfStay(reservation);
+
+        Result<Reservation> result = service.add(reservation);
+        assertFalse(result.isSuccess());
+        assertNull(result.getPayload());
+        assertTrue(result.getErrorMessages().get(0).contains("cannot be the same"));
+    }//shouldNotAddReservationIfDatesOverlap
+
+    @Test
+    void shouldNotAddReservationIfDatesAreBackwards() throws DataException {
+        Reservation reservation = new Reservation();
+        reservation.setGuest(GuestRepositoryDouble.GUEST);
+        reservation.setHost(HostRepositoryDouble.HOST);
+        reservation.setStartDateOfStay(LocalDate.of(2022,10,13));
+        reservation.setEndDateOfStay(LocalDate.of(2021,10,13));
+
+        service.returnCostOfStay(reservation);
+
+        Result<Reservation> result = service.add(reservation);
+        assertFalse(result.isSuccess());
+        assertNull(result.getPayload());
+        assertTrue(result.getErrorMessages().get(0).contains("cannot"));
+    }//shouldNotAddReservationIfDatesAreBackwards
 
     //READ
     @Test
@@ -105,7 +123,7 @@ public class ReservationServiceTest {
         List actual = service.findByHost(host);
         assertTrue(actual.isEmpty());
         assertEquals(0, actual.size());
-    }//shouldNotFindByBlankHostEmail
+    }//shouldNotFindByNullHost
 
     @Test
     void shouldValidateDuplicateDates() throws DataException {
@@ -126,7 +144,7 @@ public class ReservationServiceTest {
     }//shouldValidateDuplicateDates
 
     @Test
-    void shouldNotHaveEndDateBeforeStartDate() throws DataException {
+    void shouldNotValidateEndDateBeforeStartDate() throws DataException {
         Result<Reservation> result = new Result<>();
         Reservation newReservation = new Reservation(LocalDate.of(2023, 10,20), LocalDate.of(2023, 10, 19));
         List<Reservation> existingReservations = new ArrayList<>(List.of());
@@ -134,20 +152,20 @@ public class ReservationServiceTest {
         assertFalse(result.isSuccess());
         assertEquals(1, result.getErrorMessages().size());
         assertEquals("Start date must be before end date.", result.getErrorMessages().get(0));
-    }//shouldNotHaveEndDateBeforeStartDate
+    }//shouldNotValidateEndDateBeforeStartDate
 
     @Test
-    void shouldNotBookOnSameDay() throws DataException {
+    void shouldNotValidateBookingOnSameDay() throws DataException {
         Result<Reservation> result = new Result<>();
         LocalDate today = LocalDate.now();
         Reservation newReservation = new Reservation(today, today);
         List<Reservation> existingReservations = new ArrayList<>(List.of());
         service.validateDuplicates(result, newReservation, existingReservations);
         assertFalse(result.isSuccess());
-    }//shouldNotHaveSameDates
+    }//shouldNotValidateBookingOnSameDay
 
     @Test
-    void shouldNotHaveOverlappingDates() throws DataException {
+    void shouldNotValidateHavingOverlappingDates() throws DataException {
         Result<Reservation> result = new Result<>();
         LocalDate today = LocalDate.now();
         Reservation newReservation = new Reservation(today, today.plusDays(1));
@@ -155,7 +173,7 @@ public class ReservationServiceTest {
         service.validateDuplicates(result, newReservation, existingReservations);
         assertFalse(result.isSuccess());
         assertTrue(result.getErrorMessages().get(0).contains("overlap"));
-    }//shouldNotHaveSameDates
+    }//shouldNotValidateHavingOverlappingDates
 
     //UPDATE
     @Test
@@ -183,9 +201,37 @@ public class ReservationServiceTest {
         Result<Reservation> result = service.update(reservation);
         assertTrue(result.getErrorMessages().get(0).contains("Reservation does not exist."));
         assertFalse(result.isSuccess());
-    }//shouldUpdate
+    }//shouldNotUpdateNonExistentReservation
 
-//    DELETE
+    @Test
+    void shouldNotUpdatePastReservation() throws DataException{
+        Reservation reservation = new Reservation();
+        reservation.setId(9999999);
+        reservation.setGuest(GuestRepositoryDouble.GUEST);
+        reservation.setHost(HostRepositoryDouble.HOST);
+        reservation.setStartDateOfStay(LocalDate.of(0, 1,1));
+        reservation.setEndDateOfStay(LocalDate.of(0, 1,2));
+
+        Result<Reservation> result = service.update(reservation);
+        assertTrue(result.getErrorMessages().get(0).contains("You cannot update a reservation set in the past."));
+        assertFalse(result.isSuccess());
+    }//shouldNotUpdatePastReservation
+
+    @Test
+    void shouldNotUpdateReservationWithSameDates() throws DataException{
+        Reservation reservation = new Reservation();
+        reservation.setId(9999999);
+        reservation.setGuest(GuestRepositoryDouble.GUEST);
+        reservation.setHost(HostRepositoryDouble.HOST);
+        reservation.setStartDateOfStay(LocalDate.of(3000, 1,1));
+        reservation.setEndDateOfStay(LocalDate.of(3000, 1,1));
+
+        Result<Reservation> result = service.update(reservation);
+        assertTrue(result.getErrorMessages().get(0).contains("cannot"));
+        assertFalse(result.isSuccess());
+    }//shouldNotUpdateReservationWithSameDates
+
+    //DELETE
     @Test
     void shouldDelete() throws DataException{
         List<Reservation> all = service.findByHost(HostRepositoryDouble.HOST);
@@ -214,10 +260,9 @@ public class ReservationServiceTest {
         reservation.setHost(HostRepositoryDouble.HOST);
         reservation.setStartDateOfStay(LocalDate.of(2022,8,12));
         reservation.setEndDateOfStay(LocalDate.of(2022,8,13));
-
-        service.returnCostOfStay(reservation);
+        reservation.setTotalCost(service.returnCostOfStay(reservation));
         assertNotNull(reservation);
-        assertEquals(BigDecimal.valueOf(200), reservation.getTotalCost());
+        assertEquals(BigDecimal.valueOf(200.00).setScale(2, RoundingMode.HALF_EVEN), reservation.getTotalCost());
     }//shouldCalculateTotal
 
 }//end
