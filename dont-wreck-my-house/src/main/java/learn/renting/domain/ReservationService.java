@@ -87,12 +87,13 @@ public class ReservationService {
                 }
             }
             if(!reservationRepository.deleteReservation(reservation)){
-                result.addErrorMessage("Reservation does not exist.");
+                result.addErrorMessage("Reservation does not exist for deleting.");
                 return result;
             }
-            reservationRepository.deleteReservation(reservation);//added this
-            return result;
+//            reservationRepository.deleteReservation(reservation);//added this
+//            return result;
             }
+        reservationRepository.deleteReservation(reservation);//added this
         return result;
     }//delete
 
