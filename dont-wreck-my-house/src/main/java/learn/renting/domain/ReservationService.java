@@ -90,8 +90,6 @@ public class ReservationService {
                 result.addErrorMessage("Reservation does not exist for deleting.");
                 return result;
             }
-//            reservationRepository.deleteReservation(reservation);//added this
-//            return result;
             }
         reservationRepository.deleteReservation(reservation);//added this
         return result;
@@ -193,9 +191,9 @@ public class ReservationService {
         LocalDate day = reservation.getStartDateOfStay();
         BigDecimal totalCost = BigDecimal.ZERO;
         do{
-            totalCost = trueIfIsWeekendRate(day)?
-                    totalCost.add(reservation.getHost().getWeekendRateOfHost()):
-                    totalCost.add(reservation.getHost().getStandardRateOfHost());
+           totalCost = !trueIfIsWeekendRate(day) ?
+                    totalCost.add(reservation.getHost().getStandardRateOfHost()):
+                    totalCost.add(reservation.getHost().getWeekendRateOfHost());
             day = day.plusDays(1);
         }while(day.isBefore(reservation.getEndDateOfStay()));
         return totalCost.setScale(2, RoundingMode.HALF_EVEN);

@@ -11,7 +11,7 @@ public class Host {
     private String addressOfHost;
     private String cityOfHost;
     private String stateOfHost;
-    private String postalCodeOfHost;//change issues
+    private String postalCodeOfHost;
     private BigDecimal standardRateOfHost;
     private BigDecimal weekendRateOfHost;
 
