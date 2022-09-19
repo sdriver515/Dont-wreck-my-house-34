@@ -85,10 +85,10 @@ public class ReservationService {
                     result.addErrorMessage("Past reservations cannot be deleted.");
                     return result;
                 }
-            }
-            if(!reservationRepository.deleteReservation(reservation)){
-                result.addErrorMessage("Reservation does not exist for deleting.");
-                return result;
+                if(!reservationRepository.deleteReservation(reservation)){
+                    result.addErrorMessage("Reservation does not exist for deleting.");
+                    return result;
+                }
             }
             }
         reservationRepository.deleteReservation(reservation);//added this
