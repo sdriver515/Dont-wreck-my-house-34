@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="guest_repository" class="learn.renting.data.GuestFileRepository">
+        <constructor-arg value="./dont-wreck-my-house-data/guests.csv"/>
+    </bean>
+    <bean id="host_repository" class="learn.renting.data.HostFileRepository">
+        <constructor-arg value="./dont-wreck-my-house-data/hosts.csv"/>
+    </bean>
+    <bean id="reservation_repository" class="learn.renting.data.ReservationFileRepository">
+        <constructor-arg value="./dont-wreck-my-house-data/reservations"/>
+    </bean>
+
+
+    <bean id="guest_service" class="learn.renting.domain.GuestService">
+        <constructor-arg ref="guest_repository"/>
+    </bean>
+    <bean id="host_service" class="learn.renting.domain.HostService">
+        <constructor-arg ref="host_repository"/>
+    </bean>
+    <bean id="reservation_service" class="learn.renting.domain.ReservationService">
+        <constructor-arg ref="reservation_repository"/>
+    </bean>
+
+    <bean id="view" class="learn.renting.ui.View"/>
+
+    <bean class="learn.renting.ui.Controller">
+        <constructor-arg ref="view"/>
+        <constructor-arg ref="host_service"/>
+        <constructor-arg ref="guest_service"/>
+        <constructor-arg ref="reservation_service"/>
+    </bean>
+
+</beans>
